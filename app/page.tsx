@@ -9,7 +9,6 @@ export default function DashboardPage() {
   }
 
   const totalRevenue = orders.reduce((sum: number, order: { total?: number }) => sum + (order.total || 0), 0);
-  console.log(totalRevenue);
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-gray-100">
       <div className="p-6 rounded-lg shadow bg-white">
