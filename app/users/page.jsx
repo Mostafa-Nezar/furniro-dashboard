@@ -2,7 +2,8 @@
 import { useAppContext } from "../context/context";
 
 export default function Users() {
-  const { usersData, loading, handleDelete } = useAppContext();
+  const { usersData, loading, handleDeleteUser } = useAppContext();
+
 
   if (loading) return <p className="text-center py-4">Loading users...</p>;
 
@@ -47,7 +48,7 @@ export default function Users() {
                   </td>
                   <td className="px-6 py-4 text-center">
                     <button
-                      onClick={() => handleDelete(user._id)}
+                      onClick={() => handleDeleteUser(user._id)}
                       className="px-3 py-1 bg-red-500 text-white rounded-md text-sm font-semibold hover:bg-red-600 transition-colors"
                     >
                       Delete

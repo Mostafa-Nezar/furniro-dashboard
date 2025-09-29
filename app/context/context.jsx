@@ -11,7 +11,6 @@ export function AppProvider({ children }) {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("adminToken") : "";
 
-  // ================== Users ==================
   const fetchUsers = async () => {
     try {
       const res = await fetch(
