@@ -8,7 +8,7 @@ export default function DashboardPage() {
     return <p className="text-center py-6">Loading dashboard...</p>;
   }
 
-  const totalRevenue = orders.reduce((sum: number, order: Order) => sum + (order.total || 0), 0);
+  const totalRevenue = orders.reduce((sum: number, order: { total?: number }) => sum + (order.total || 0), 0);
   console.log(totalRevenue);
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-gray-100">
