@@ -28,7 +28,10 @@ export default function RootLayout({
               Users
             </Link>
             <Link href="/products" className="hover:bg-gray-700 px-3 py-2 rounded">
-              products
+            add products
+            </Link>
+            <Link href="/getproducts" className="hover:bg-gray-700 px-3 py-2 rounded">
+            all  products
             </Link>
           </nav>
         </aside>

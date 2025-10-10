@@ -6,6 +6,7 @@ const AppContext = createContext();
 export function AppProvider({ children }) {
   const [usersData, setUsersData] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [products, setproducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const token =
@@ -25,6 +26,26 @@ export function AppProvider({ children }) {
       if (!res.ok) throw new Error("Failed to fetch users");
       const data = await res.json();
       setUsersData(data || []);
+    } catch (err) {
+      console.error("❌ Error fetching users:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch(
+        "https://furniro-back-production.up.railway.app/api/products/db",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!res.ok) throw new Error("Failed to fetch users");
+      const data = await res.json();
+      setproducts(data || []);
     } catch (err) {
       console.error("❌ Error fetching users:", err.message);
     } finally {
@@ -56,8 +77,29 @@ export function AppProvider({ children }) {
       alert(err.message);
     }
   };
+    const deleteProduct = async (id) => {
+    if (!confirm("Are you sure you want to delete this product?")) return;
 
-  // ================== Orders ==================
+    try {
+      setLoading(true);
+      const res = await fetch(`https://furniro-back-production.up.railway.app/api/products/${id}/delete`, { method: "DELETE" });
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Product deleted successfully");
+        setproducts(products.filter((prod) => prod.id !== id));
+      } else {
+        alert(data.message || "Error deleting product");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error while deleting product");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   const fetchOrders = async () => {
     try {
       const res = await fetch(
@@ -79,10 +121,10 @@ export function AppProvider({ children }) {
     }
   };
 
-  // ================== Effects ==================
   useEffect(() => {
     fetchUsers();
     fetchOrders();
+    fetchProducts();
   }, []);
 
   return (
@@ -90,10 +132,12 @@ export function AppProvider({ children }) {
       value={{
         usersData,
         orders,
+        products,
         loading,
         fetchUsers,
         fetchOrders,
         handleDeleteUser,
+        deleteProduct,
       }}
     >
       {children}

@@ -1,10 +1,19 @@
 "use client";
 import { useAppContext } from "../context/context";
+import { useRouter } from "next/navigation";
 
 export default function Orders() {
   const { orders, loading } = useAppContext();
+  const router = useRouter();
 
   if (loading) return <p className="text-center py-4">Loading orders...</p>;
+
+  const formatDate = (date) =>
+    new Date(date).toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -16,9 +25,7 @@ export default function Orders() {
               <th className="px-6 py-3 text-left">ID</th>
               <th className="px-6 py-3 text-left">Customer</th>
               <th className="px-6 py-3 text-left">Status</th>
-              <th className="px-6 py-3 text-left">Payment</th>
               <th className="px-6 py-3 text-left">Total</th>
-              <th className="px-6 py-3 text-left">Products</th>
               <th className="px-6 py-3 text-left">Order Date</th>
             </tr>
           </thead>
@@ -26,7 +33,8 @@ export default function Orders() {
             {orders.map((order) => (
               <tr
                 key={order._id}
-                className="hover:bg-gray-50 transition-colors"
+                className="hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => router.push(`/orderdetails/${order._id}`)}
               >
                 <td className="px-6 py-4 text-sm text-gray-600">{order._id}</td>
                 <td className="px-6 py-4 text-sm font-medium text-gray-800">
@@ -45,23 +53,11 @@ export default function Orders() {
                     {order.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  {order.paymentdone}
-                </td>
                 <td className="px-6 py-4 font-semibold text-gray-800">
                   ${order.total}
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  <ul className="list-disc pl-5 space-y-1">
-                    {order.products?.map((p, i) => (
-                      <li key={i}>
-                        {p.name} x{p.quantity} (${p.price})
-                      </li>
-                    ))}
-                  </ul>
-                </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  {new Date(order.date).toLocaleString()}
+                  {formatDate(order.date)}
                 </td>
               </tr>
             ))}
