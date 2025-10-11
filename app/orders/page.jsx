@@ -28,6 +28,7 @@ export default function Orders() {
               <th className="px-6 py-3 text-left">Status</th>
               <th className="px-6 py-3 text-left">Total</th>
               <th className="px-6 py-3 text-left">Order Date</th>
+              <th className="px-6 py-3 text-left">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
