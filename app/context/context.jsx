@@ -119,7 +119,6 @@ export function AppProvider({ children }) {
   };
   const deleteOrder = async (id) => {
   try {
-    setLoading(true);
     const res = await fetch(`https://furniro-back-production.up.railway.app/api/orders/${id}`, {
       method: "DELETE",
       headers: {
@@ -137,8 +136,6 @@ export function AppProvider({ children }) {
   } catch (err) {
     console.error(err);
     alert("Server error while deleting order");
-  } finally {
-    setLoading(false);
   }
 };
 
