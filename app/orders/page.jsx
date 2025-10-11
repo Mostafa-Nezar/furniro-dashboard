@@ -3,7 +3,8 @@ import { useAppContext } from "../context/context";
 import { useRouter } from "next/navigation";
 
 export default function Orders() {
-  const { orders, loading } = useAppContext();
+  const { orders, loading, deleteOrder } = useAppContext();
+
   const router = useRouter();
 
   if (loading) return <p className="text-center py-4">Loading orders...</p>;
@@ -34,9 +35,11 @@ export default function Orders() {
               <tr
                 key={order._id}
                 className="hover:bg-gray-50 transition-colors cursor-pointer"
-                onClick={() => router.push(`/orderdetails/${order._id}`)}
               >
-                <td className="px-6 py-4 text-sm text-gray-600">{order._id}</td>
+                <td 
+                className="px-6 py-4 text-sm text-gray-600"
+                onClick={() => router.push(`/orderdetails/${order._id}`)}
+                >{order._id}</td>
                 <td className="px-6 py-4 text-sm font-medium text-gray-800">
                   {order.customerInfo?.fullName}
                 </td>
@@ -59,6 +62,13 @@ export default function Orders() {
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {formatDate(order.date)}
                 </td>
+                <td className="px-6 py-4">
+                <button
+                  onClick={() => deleteOrder(order._id)}
+                  className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition">
+                  Delete
+                </button>
+              </td>
               </tr>
             ))}
           </tbody>

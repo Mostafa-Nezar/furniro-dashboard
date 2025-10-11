@@ -52,7 +52,6 @@ export function AppProvider({ children }) {
       setLoading(false);
     }
   };
-
   const handleDeleteUser = async (id) => {
     try {
       const res = await fetch(
@@ -98,8 +97,6 @@ export function AppProvider({ children }) {
       setLoading(false);
     }
   };
-
-
   const fetchOrders = async () => {
     try {
       const res = await fetch(
@@ -120,7 +117,32 @@ export function AppProvider({ children }) {
       setLoading(false);
     }
   };
+  const deleteOrder = async (id) => {
+  try {
+    setLoading(true);
+    const res = await fetch(`https://furniro-back-production.up.railway.app/api/orders/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
 
+    if (res.ok) {
+      setOrders(orders.filter((order) => order._id !== id));
+    } else {
+      alert(data.error || "Error deleting order");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Server error while deleting order");
+  } finally {
+    setLoading(false);
+  }
+};
+
+  
   useEffect(() => {
     fetchUsers();
     fetchOrders();
@@ -138,6 +160,7 @@ export function AppProvider({ children }) {
         fetchOrders,
         handleDeleteUser,
         deleteProduct,
+        deleteOrder
       }}
     >
       {children}
