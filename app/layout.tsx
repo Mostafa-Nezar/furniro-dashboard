@@ -15,7 +15,7 @@ export default function RootLayout({
       <body className="flex min-h-screen bg-green-400 text-black">
         {/* Sidebar */}
         <aside className="w-64 bg-gray-900 text-white p-4 flex flex-col">
-          <img src="/logo.png" alt="" />
+          <img src="https://res.cloudinary.com/dutetsivc/image/upload/v1760013317/logo_ikqv7r.png" alt="" />
           <h2 className="text-xl font-bold mb-6">Dashboard</h2>
           <nav className="flex flex-col gap-2">
             <Link href="/" className="hover:bg-gray-700 px-3 py-2 rounded">
