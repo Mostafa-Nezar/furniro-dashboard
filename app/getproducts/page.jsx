@@ -22,13 +22,17 @@ export default function Products() {
             >
               <div>
                 <h2 onClick={() => router.push(`/productdetails/${product.id}`)} className="cursor-pointer text-xl font-semibold">{product.name}</h2>
-                <p className="text-white text-2xl">${product.id}</p>
+                <p className="text-white text-2xl">{product.id}</p>
                 <p className="text-gray-600">${product.price}</p>
                 <p className="text-gray-600">{product.quantity}</p>
                 <p className="text-white text-2xl">{product.averagerate}</p>
                 <p className="text-white text-2xl">{product.ratecount}</p>
                 <p className="text-gray-600">{new Date(product.date).toLocaleDateString("en-US", {day: "numeric", month: "long",year: "numeric", hour: "2-digit",minute: "2-digit" })}</p>
               </div>
+              <button onClick={() => router.push(`/editproduct/${product.id}`)}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-200">
+                edit
+              </button>
               <button
                 onClick={() => deleteProduct(product.id)}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition duration-200"

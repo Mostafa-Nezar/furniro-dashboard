@@ -31,7 +31,7 @@ export default function RootLayout({
             add products
             </Link>
             <Link href="/getproducts" className="hover:bg-gray-700 px-3 py-2 rounded">
-            all  products
+            all products
             </Link>
           </nav>
         </aside>
