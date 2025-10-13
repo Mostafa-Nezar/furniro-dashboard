@@ -64,7 +64,7 @@ export default function EditProduct() {
       data.append(key, formData[key]);
     }
 
-    const res = await fetch(`http://localhost:3001/api/update-product/${productId}`, {
+    const res = await fetch(`https://furniro-back-production.up.railway.app/api/update-product/${productId}`, {
       method: "PUT",
       body: data,
     });
