@@ -79,7 +79,7 @@ export default function OrderDetails() {
           <strong>Address:</strong> {order.customerInfo?.address}
         </p>
                 <p>
-          <strong>phone:</strong> {order.customerInfo?.number}
+          <strong>phone:</strong> {order.customerInfo?.phoneNumber}
         </p>
       </div>
 
