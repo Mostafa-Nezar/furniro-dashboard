@@ -65,7 +65,6 @@ export default function OrderDetails() {
         Order #{order._id}
       </h2>
 
-      {/* معلومات العميل */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <h3 className="text-lg font-semibold mb-4 text-gray-700">
           Customer Information
@@ -79,9 +78,11 @@ export default function OrderDetails() {
         <p>
           <strong>Address:</strong> {order.customerInfo?.address}
         </p>
+                <p>
+          <strong>phone:</strong> {order.customerInfo?.number}
+        </p>
       </div>
 
-      {/* تفاصيل الأوردر */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <h3 className="text-lg font-semibold mb-4 text-gray-700">
           Order Details
@@ -109,8 +110,6 @@ export default function OrderDetails() {
           <strong>Total:</strong> ${order.total}
         </p>
       </div>
-
-      {/* المنتجات */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4 text-gray-700">Products</h3>
         <table className="min-w-full border-collapse">
@@ -137,27 +136,13 @@ export default function OrderDetails() {
         </table>
       </div>
       <div className="mt-6 flex gap-3">
-          <button
-            onClick={() => updateStatus("refused")}
-            disabled={updating}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:opacity-50"
-          >
+          <button onClick={() => updateStatus("refused")} disabled={updating} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:opacity-50">
             Refuse
           </button>
-
-          <button
-            onClick={() => updateStatus("shipping")}
-            disabled={updating}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
-          >
+          <button onClick={() => updateStatus("shipping")} disabled={updating} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50">
             Shipping
           </button>
-
-          <button
-            onClick={() => updateStatus("delivered")}
-            disabled={updating}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50"
-          >
+          <button onClick={() => updateStatus("delivered")} disabled={updating} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50">
             Delivered
           </button>
         </div>

@@ -71,7 +71,7 @@ export default function EditProduct() {
 
     if (res.ok) {
       alert("Product updated successfully!");
-      router.push("/admin/products");
+      router.push("/getproducts");
     } else {
       const err = await res.json();
       alert("Error: " + err.message);

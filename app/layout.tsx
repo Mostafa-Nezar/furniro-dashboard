@@ -15,22 +15,24 @@ export default function RootLayout({
       <body className="flex min-h-screen bg-green-400 text-black">
         {/* Sidebar */}
         <aside className="w-64 bg-gray-900 text-white p-4 flex flex-col">
-          <img src="https://res.cloudinary.com/dutetsivc/image/upload/v1760013317/logo_ikqv7r.png" alt="" />
-          <h2 className="text-xl font-bold mb-6">Dashboard</h2>
+          <div className="flex gap-2">
+            <img src="https://res.cloudinary.com/dutetsivc/image/upload/v1760013317/logo_ikqv7r.png" className="w-12 h-8" alt="" />
+            <h2 className="text-xl font-bold mb-6">Furniro</h2>
+          </div>
           <nav className="flex flex-col gap-2">
-            <Link href="/" className="hover:bg-gray-700 px-3 py-2 rounded">
+            <Link href="/" className="hover:bg-gray-800 px-3 pb-2 rounded">
               Home
             </Link>
-            <Link href="/orders" className="hover:bg-gray-700 px-3 py-2 rounded">
+            <Link href="/orders" className="hover:bg-gray-800 px-3 pb-2 rounded">
               Orders
             </Link>
-            <Link href="/users" className="hover:bg-gray-700 px-3 py-2 rounded">
+            <Link href="/users" className="hover:bg-gray-800 px-3 pb-2 rounded">
               Users
             </Link>
-            <Link href="/products" className="hover:bg-gray-700 px-3 py-2 rounded">
+            <Link href="/products" className="hover:bg-gray-800 px-3 pb-2 rounded">
             add products
             </Link>
-            <Link href="/getproducts" className="hover:bg-gray-700 px-3 py-2 rounded">
+            <Link href="/getproducts" className="hover:bg-gray-800 px-3 pb-2 rounded">
             all products
             </Link>
           </nav>
