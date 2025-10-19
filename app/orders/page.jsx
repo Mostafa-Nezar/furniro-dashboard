@@ -1,10 +1,13 @@
 "use client";
+import { useEffect } from "react";
 import { useAppContext } from "../context/context";
 import { useRouter } from "next/navigation";
 
 export default function Orders() {
-  const { orders, loading, deleteOrder } = useAppContext();
-
+  const { orders, loading, fetchOrders, deleteOrder } = useAppContext();
+    useEffect(() => {
+    fetchOrders();
+  }, []);
   const router = useRouter();
 
   if (loading) return <p className="text-center py-4">Loading orders...</p>;
