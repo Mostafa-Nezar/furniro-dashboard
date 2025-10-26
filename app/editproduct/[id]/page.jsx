@@ -9,7 +9,7 @@ export default function EditProduct() {
   const params = useParams();
   const productId = params.id;
 
-  const { products } = useAppContext(); 
+  const { products } = useAppContext();
 
   const [product, setProduct] = useState(null);
   const [formData, setFormData] = useState({
@@ -64,10 +64,13 @@ export default function EditProduct() {
       data.append(key, formData[key]);
     }
 
-    const res = await fetch(`https://furniro-back-production.up.railway.app/api/update-product/${productId}`, {
-      method: "PUT",
-      body: data,
-    });
+    const res = await fetch(
+      `https://furniro-back-production.up.railway.app/api/update-product/${productId}`,
+      {
+        method: "PUT",
+        body: data,
+      }
+    );
 
     if (res.ok) {
       alert("Product updated successfully!");
@@ -81,89 +84,96 @@ export default function EditProduct() {
   if (!product) return <p>Loading...</p>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Edit Product</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={formData.name}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          value={formData.price}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
+    <div className="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-2xl">
+      <h1 className="text-3xl font-bold mb-6 text-center text-indigo-600">
+        Edit Product
+      </h1>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* الاسم والسعر */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            type="text"
+            name="name"
+            placeholder="Name"
+            value={formData.name}
+            onChange={handleChange}
+            className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <input
+            type="number"
+            name="price"
+            placeholder="Price"
+            value={formData.price}
+            onChange={handleChange}
+            className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        {/* الوصف والكمية */}
         <textarea
           name="des"
           placeholder="Description"
           value={formData.des}
           onChange={handleChange}
-          className="border p-2 w-full"
+          className="border border-gray-300 rounded-lg p-3 w-full h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
-        <input
-          type="number"
-          name="quantity"
-          placeholder="Quantity"
-          value={formData.quantity}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
-        <input
-          type="number"
-          name="sale"
-          placeholder="Sale"
-          value={formData.sale}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            type="number"
+            name="quantity"
+            placeholder="Quantity"
+            value={formData.quantity}
+            onChange={handleChange}
+            className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <input
+            type="number"
+            name="sale"
+            placeholder="Sale"
+            value={formData.sale}
+            onChange={handleChange}
+            className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
 
-        <label>General (JSON)</label>
-        <textarea
-          name="general"
-          value={formData.general}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
+        {/* الـ JSON Fields */}
+        {["general", "myproduct", "dimensions", "warranty"].map((field) => (
+          <div key={field}>
+            <label className="block mb-2 font-semibold text-gray-700">
+              {field.charAt(0).toUpperCase() + field.slice(1)} (JSON)
+            </label>
+            <textarea
+              name={field}
+              value={formData[field]}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-lg p-3 w-full h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        ))}
 
-        <label>MyProduct (JSON)</label>
-        <textarea
-          name="myproduct"
-          value={formData.myproduct}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
+        {/* Images */}
+        <div>
+          <label className="block mb-2 font-semibold text-gray-700">
+            Images
+          </label>
+          <div className="flex flex-wrap gap-3">
+            {["image", "image1", "image2", "image3", "image4"].map((img) => (
+              <input
+                key={img}
+                type="file"
+                name={img}
+                onChange={handleChange}
+                className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            ))}
+          </div>
+        </div>
 
-        <label>Dimensions (JSON)</label>
-        <textarea
-          name="dimensions"
-          value={formData.dimensions}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
-
-        <label>Warranty (JSON)</label>
-        <textarea
-          name="warranty"
-          value={formData.warranty}
-          onChange={handleChange}
-          className="border p-2 w-full"
-        />
-
-        <label>Images</label>
-        <input type="file" name="image" onChange={handleChange} />
-        <input type="file" name="image1" onChange={handleChange} />
-        <input type="file" name="image2" onChange={handleChange} />
-        <input type="file" name="image3" onChange={handleChange} />
-        <input type="file" name="image4" onChange={handleChange} />
-
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-lg transition duration-200"
+        >
           Update Product
         </button>
       </form>
