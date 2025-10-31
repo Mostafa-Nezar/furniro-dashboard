@@ -81,11 +81,11 @@ export default function EditProduct() {
     }
   };
 
-  if (!product) return <p>Loading...</p>;
+  if (!product) return <p className="text-center py-6 text-muted">Loading...</p>;
 
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-2xl">
-      <h1 className="text-3xl font-bold mb-6 text-center text-indigo-600">
+    <div className="max-w-3xl mx-auto p-8 card">
+      <h1 className="text-3xl font-bold mb-6 text-center text-heading">
         Edit Product
       </h1>
 
@@ -98,7 +98,8 @@ export default function EditProduct() {
             placeholder="Name"
             value={formData.name}
             onChange={handleChange}
-            className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="rounded-lg p-3 w-full bg-surface border focus:outline-none focus:ring-2"
+            style={{borderColor:'var(--color-border)'}}
           />
           <input
             type="number"
@@ -106,7 +107,8 @@ export default function EditProduct() {
             placeholder="Price"
             value={formData.price}
             onChange={handleChange}
-            className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="rounded-lg p-3 w-full bg-surface border focus:outline-none focus:ring-2"
+            style={{borderColor:'var(--color-border)'}}
           />
         </div>
 
@@ -116,7 +118,8 @@ export default function EditProduct() {
           placeholder="Description"
           value={formData.des}
           onChange={handleChange}
-          className="border border-gray-300 rounded-lg p-3 w-full h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="rounded-lg p-3 w-full h-24 bg-surface border focus:outline-none focus:ring-2"
+          style={{borderColor:'var(--color-border)'}}
         />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
@@ -125,7 +128,8 @@ export default function EditProduct() {
             placeholder="Quantity"
             value={formData.quantity}
             onChange={handleChange}
-            className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="rounded-lg p-3 w-full bg-surface border focus:outline-none focus:ring-2"
+            style={{borderColor:'var(--color-border)'}}
           />
           <input
             type="number"
@@ -133,28 +137,30 @@ export default function EditProduct() {
             placeholder="Sale"
             value={formData.sale}
             onChange={handleChange}
-            className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="rounded-lg p-3 w-full bg-surface border focus:outline-none focus:ring-2"
+            style={{borderColor:'var(--color-border)'}}
           />
         </div>
 
         {/* الـ JSON Fields */}
         {["general", "myproduct", "dimensions", "warranty"].map((field) => (
           <div key={field}>
-            <label className="block mb-2 font-semibold text-gray-700">
+            <label className="block mb-2 font-semibold text-heading">
               {field.charAt(0).toUpperCase() + field.slice(1)} (JSON)
             </label>
             <textarea
               name={field}
               value={formData[field]}
               onChange={handleChange}
-              className="border border-gray-300 rounded-lg p-3 w-full h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="rounded-lg p-3 w-full h-24 bg-surface border focus:outline-none focus:ring-2"
+              style={{borderColor:'var(--color-border)'}}
             />
           </div>
         ))}
 
         {/* Images */}
         <div>
-          <label className="block mb-2 font-semibold text-gray-700">
+          <label className="block mb-2 font-semibold text-heading">
             Images
           </label>
           <div className="flex flex-wrap gap-3">
@@ -164,7 +170,8 @@ export default function EditProduct() {
                 type="file"
                 name={img}
                 onChange={handleChange}
-                className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="rounded-lg p-2 bg-surface border focus:outline-none focus:ring-2"
+                style={{borderColor:'var(--color-border)'}}
               />
             ))}
           </div>
@@ -172,7 +179,7 @@ export default function EditProduct() {
 
         <button
           type="submit"
-          className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-lg transition duration-200"
+          className="w-full btn btn-primary justify-center"
         >
           Update Product
         </button>

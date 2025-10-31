@@ -46,16 +46,17 @@ export default function AdminLogin() {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "8px" }}>
-      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Admin Login</h2>
-      <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <div className="max-w-sm mx-auto mt-12 p-6 card">
+      <h2 className="text-center text-2xl font-semibold mb-6 text-heading">Admin Login</h2>
+      <form onSubmit={handleLogin} className="flex flex-col gap-3">
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ padding: "10px", fontSize: "16px" }}
+          className="w-full rounded-md bg-surface px-3 py-2 border focus:outline-none focus:ring-2"
+          style={{borderColor: "var(--color-border)"}}
         />
         <input
           type="password"
@@ -63,12 +64,13 @@ export default function AdminLogin() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          style={{ padding: "10px", fontSize: "16px" }}
+          className="w-full rounded-md bg-surface px-3 py-2 border focus:outline-none focus:ring-2"
+          style={{borderColor: "var(--color-border)"}}
         />
-        <button type="submit" disabled={loading} style={{ padding: "10px", fontSize: "16px", cursor: "pointer" }}>
+        <button type="submit" disabled={loading} className="btn btn-primary justify-center">
           {loading ? "Logging in..." : "Login"}
         </button>
-        {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+        {error && <p className="text-sm" style={{color:'#ef4444'}}>{error}</p>}
       </form>
     </div>
   );

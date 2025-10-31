@@ -2,6 +2,7 @@
 import { useAppContext } from "../../context/context";
 import { useRouter, useParams } from "next/navigation";
 import { useState } from "react";
+import { ArrowLeft } from "lucide-react";
 
 export default function ProductDetails() {
   const { products } = useAppContext();
@@ -16,7 +17,7 @@ export default function ProductDetails() {
 
   if (!product)
     return (
-      <p className="text-center mt-10 text-red-500 font-semibold">
+      <p className="text-center mt-10" style={{color:'#ef4444', fontWeight:600}}>
         Product not found
       </p>
     );
@@ -25,27 +26,27 @@ export default function ProductDetails() {
     <div className="p-6 max-w-6xl mx-auto">
       <button
         onClick={() => router.back()}
-        className="mb-6 text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+        className="btn btn-primary mb-6 inline-flex items-center gap-2"
       >
-        &larr; Back to Products
+        <ArrowLeft size={16} /> Back to Products
       </button>
 
       {/* العنوان والوصف */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-3">
+        <h1 className="text-4xl font-bold text-heading mb-3">
           {product.name}
         </h1>
-        <p className="text-gray-700 text-lg">{product.des}</p>
+        <p className="text-body text-lg">{product.des}</p>
       </div>
 
       <div className="flex flex-col md:flex-row gap-10">
         {/* قسم الصور */}
         <div className="flex-1">
-          <div className="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center">
+          <div className="card p-4 flex flex-col items-center">
             <img
               src={selectedImage}
               alt={product.name}
-              className="w-full h-96 object-contain rounded-lg mb-4 border border-gray-200 shadow-inner"
+              className="w-full h-96 object-contain rounded-lg mb-4"
             />
             <div className="flex gap-3 overflow-x-auto py-2">
               {[
@@ -64,7 +65,7 @@ export default function ProductDetails() {
                     className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-4 transition-all ${
                       selectedImage === img
                         ? "border-indigo-500 scale-105"
-                        : "border-gray-300"
+                        : "border-gray-600"
                     } hover:border-indigo-400 hover:scale-105`}
                     onClick={() => setSelectedImage(img)}
                   />
@@ -75,23 +76,23 @@ export default function ProductDetails() {
 
         {/* قسم التفاصيل */}
         <div className="flex-1 space-y-6">
-          <div className="bg-white p-6 rounded-xl shadow-lg space-y-3">
-            <p className="text-2xl font-semibold text-gray-900">
+          <div className="card p-6 space-y-3">
+            <p className="text-2xl font-semibold text-heading">
               Price: ${product.price}
             </p>
             {product.sale && (
-              <p className="text-red-500 font-bold text-lg">
+              <p className="font-bold text-lg" style={{color:'#ef4444'}}>
                 Sale: {product.sale}% off
               </p>
             )}
-            <p className="text-gray-700">Quantity: {product.quantity}</p>
-            <p className="text-gray-700">
+            <p className="text-body">Quantity: {product.quantity}</p>
+            <p className="text-body">
               Average Rate: {product.averagerate || 0}
             </p>
-            <p className="text-gray-700">
+            <p className="text-body">
               Rate Count: {product.ratecount || 0}
             </p>
-            <p className="text-gray-500 text-sm">
+            <p className="text-muted text-sm">
               Added on:{" "}
               {new Date(product.date).toLocaleDateString("en-US", {
                 day: "numeric",
@@ -112,15 +113,18 @@ export default function ProductDetails() {
             .map(([title, obj], idx) => (
               <div
                 key={idx}
-                className="bg-gray-50 p-5 rounded-xl shadow-inner space-y-2"
+                className="bg-surface p-5 rounded-xl space-y-2 border"
+                style={{borderColor:'var(--color-border)'}}
               >
-                <h2 className="text-lg font-bold text-gray-800 border-b border-gray-300 pb-2 mb-2">
+                <h2 className="text-lg font-bold text-heading border-b pb-2 mb-2"
+                  style={{borderColor:'var(--color-border)'}}
+                >
                   {title}
                 </h2>
                 {Object.entries(obj).map(([key, val]) => (
                   <p key={key}>
-                    <span className="font-semibold text-gray-700">{key}: </span>
-                    <span className="text-gray-600">{val}</span>
+                    <span className="font-semibold text-heading">{key}: </span>
+                    <span className="text-body">{val}</span>
                   </p>
                 ))}
               </div>

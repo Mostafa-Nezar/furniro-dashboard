@@ -74,9 +74,9 @@ export default function AddProductForm() {
   return (
     <form
   onSubmit={handleSubmit}
-  className="flex flex-col gap-4 max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg"
+  className="flex flex-col gap-4 max-w-2xl mx-auto p-6 card"
 >
-  <h2 className="text-2xl font-bold mb-4">Add Product</h2>
+  <h2 className="text-2xl font-bold mb-4 text-heading">Add Product</h2>
 
   <div className="grid grid-cols-2 gap-4">
     <input
@@ -85,14 +85,16 @@ export default function AddProductForm() {
       placeholder="Product ID"
       onChange={handleChange}
       required
-      className="w-full border rounded p-2 focus:ring-2 outline-none"
+      className="w-full rounded p-2 bg-surface border focus:ring-2 outline-none"
+      style={{borderColor:'var(--color-border)'}}
     />
     <input
       type="text"
       name="key"
       placeholder="Product Key"
       onChange={handleChange}
-      className="w-full border rounded p-2 focus:ring-2 outline-none"
+      className="w-full rounded p-2 bg-surface border focus:ring-2 outline-none"
+      style={{borderColor:'var(--color-border)'}}
     />
   </div>
 
@@ -102,7 +104,8 @@ export default function AddProductForm() {
     placeholder="Product Name"
     onChange={handleChange}
     required
-    className="w-full border rounded p-2 focus:ring-2 outline-none"
+    className="w-full rounded p-2 bg-surface border focus:ring-2 outline-none"
+    style={{borderColor:'var(--color-border)'}}
   />
 
   <input
@@ -111,21 +114,24 @@ export default function AddProductForm() {
     placeholder="Product Price"
     onChange={handleChange}
     required
-    className="w-full border rounded p-2 outline-none"
+    className="w-full rounded p-2 bg-surface border outline-none"
+    style={{borderColor:'var(--color-border)'}}
   />
 
   <textarea
     name="des"
     placeholder="Product Description..."
     onChange={handleChange}
-    className="w-full border rounded p-2 outline-none"
+    className="w-full rounded p-2 bg-surface border outline-none"
+    style={{borderColor:'var(--color-border)'}}
   />
 
   <textarea
     name="not"
     placeholder="Extra Notes..."
     onChange={handleChange}
-    className="w-full border rounded p-2 outline-none"
+    className="w-full rounded p-2 bg-surface border outline-none"
+    style={{borderColor:'var(--color-border)'}}
   />
 
   <div className="grid grid-cols-2 gap-4">
@@ -133,25 +139,29 @@ export default function AddProductForm() {
       name="general"
       placeholder="General JSON"
       onChange={handleChange}
-      className="w-full border rounded p-2 h-24 outline-none"
+      className="w-full rounded p-2 h-24 bg-surface border outline-none"
+      style={{borderColor:'var(--color-border)'}}
     />
     <textarea
       name="myproduct"
       placeholder="MyProduct JSON"
       onChange={handleChange}
-      className="w-full border rounded p-2 h-24 outline-none"
+      className="w-full rounded p-2 h-24 bg-surface border outline-none"
+      style={{borderColor:'var(--color-border)'}}
     />
     <textarea
       name="dimensions"
       placeholder="Dimensions JSON"
       onChange={handleChange}
-      className="w-full border rounded p-2 h-24 outline-none"
+      className="w-full rounded p-2 h-24 bg-surface border outline-none"
+      style={{borderColor:'var(--color-border)'}}
     />
     <textarea
       name="warranty"
       placeholder="Warranty JSON"
       onChange={handleChange}
-      className="w-full border rounded p-2 h-24 outline-none"
+      className="w-full rounded p-2 h-24 bg-surface border outline-none"
+      style={{borderColor:'var(--color-border)'}}
     />
   </div>
 
@@ -161,33 +171,37 @@ export default function AddProductForm() {
       name="sale"
       placeholder="Sale %"
       onChange={handleChange}
-      className="w-full border rounded p-2 outline-none"
+      className="w-full rounded p-2 bg-surface border outline-none"
+      style={{borderColor:'var(--color-border)'}}
     />
     <input
       type="number"
       name="averagerate"
       placeholder="Average Rate"
       onChange={handleChange}
-      className="w-full border rounded p-2 outline-none"
+      className="w-full rounded p-2 bg-surface border outline-none"
+      style={{borderColor:'var(--color-border)'}}
     />
     <input
       type="number"
       name="ratecount"
       placeholder="Rate Count"
       onChange={handleChange}
-      className="w-full border rounded p-2 outline-none"
+      className="w-full rounded p-2 bg-surface border outline-none"
+      style={{borderColor:'var(--color-border)'}}
     />
     <input
       type="number"
       name="quantity"
       placeholder="Quantity"
       onChange={handleChange}
-      className="w-full border rounded p-2 outline-none"
+      className="w-full rounded p-2 bg-surface border outline-none"
+      style={{borderColor:'var(--color-border)'}}
     />
   </div>
 
   <div>
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-2 gap-2 text-body">
       <input type="file" name="image" onChange={handleImageChange} />
       <input type="file" name="image1" onChange={handleImageChange} />
       <input type="file" name="image2" onChange={handleImageChange} />
@@ -201,7 +215,7 @@ export default function AddProductForm() {
 
   <button
     type="submit"
-    className="bg-my-bg-primary hover:bg-my-bg-yellow text-dark p-3 rounded font-semibold mt-4 transition"
+    className="btn btn-primary mt-4"
   >
     Add Product
   </button>

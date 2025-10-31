@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAppContext } from "../../context/context";
+import { ArrowLeft, Truck, CheckCircle2, XCircle } from "lucide-react";
 
 export default function OrderDetails() {
   const { orders, loading } = useAppContext();
@@ -40,7 +41,7 @@ export default function OrderDetails() {
 
   if (loading || !order)
     return (
-      <div className="text-center py-8 text-gray-600">
+      <div className="text-center py-8 text-muted">
         {loading ? "Loading..." : "Order not found."}
       </div>
     );
@@ -53,77 +54,77 @@ export default function OrderDetails() {
     });
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 min-h-screen">
       <button
         onClick={() => router.back()}
-        className="mb-6 text-sm font-semibold text-blue-600 hover:underline"
+        className="btn btn-primary mb-6 inline-flex items-center gap-2"
       >
-        ← Back to Orders
+        <ArrowLeft size={16} /> Back to Orders
       </button>
 
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">
+      <h2 className="text-2xl font-bold mb-6 text-heading">
         Order #{order._id}
       </h2>
 
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-700">
+      <div className="card p-6 mb-6">
+        <h3 className="text-lg font-semibold mb-4 text-heading">
           Customer Information
         </h3>
         <p>
-          <strong>Name:</strong> {order.customerInfo?.fullName}
+          <strong className="text-heading">Name:</strong> {order.customerInfo?.fullName}
         </p>
         <p>
-          <strong>Email:</strong> {order.customerInfo?.email}
+          <strong className="text-heading">Email:</strong> {order.customerInfo?.email}
         </p>
         <p>
-          <strong>Address:</strong> {order.customerInfo?.address}
+          <strong className="text-heading">Address:</strong> {order.customerInfo?.address}
         </p>
                 <p>
-          <strong>phone:</strong> {order.customerInfo?.phoneNumber}
+          <strong className="text-heading">phone:</strong> {order.customerInfo?.phoneNumber}
         </p>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-700">
+      <div className="card p-6 mb-6">
+        <h3 className="text-lg font-semibold mb-4 text-heading">
           Order Details
         </h3>
         <p>
-          <strong>Status:</strong>{" "}
+          <strong className="text-heading">Status:</strong>{" "}
           <span
-            className={`px-2 py-1 rounded text-xs font-semibold ${
+            className={`chip ${
               order.status === "pending"
-                ? "bg-yellow-100 text-yellow-700"
+                ? "chip-pending"
                 : order.status === "completed"
-                ? "bg-green-100 text-green-700"
+                ? "chip-completed"
                 : order.status === "refused"
-                ? "bg-red-100 text-red-700"
-                : "bg-gray-100 text-gray-600"
+                ? "chip-default"
+                : "chip-default"
             }`}
           >
             {order.status}
           </span>
         </p>
         <p>
-          <strong>Date:</strong> {formatDate(order.date)}
+          <strong className="text-heading">Date:</strong> {formatDate(order.date)}
         </p>
         <p>
-          <strong>Total:</strong> ${order.total}
+          <strong className="text-heading">Total:</strong> ${order.total}
         </p>
       </div>
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-700">Products</h3>
-        <table className="min-w-full border-collapse">
+      <div className="card p-6">
+        <h3 className="text-lg font-semibold mb-4 text-heading">Products</h3>
+        <table className="min-w-full border-collapse rounded-lg overflow-hidden">
           <thead>
-            <tr className="bg-gray-100 text-gray-700 text-sm">
+            <tr className="table-header text-sm">
               <th className="px-4 py-2 text-left">Name</th>
               <th className="px-4 py-2 text-left">Quantity</th>
               <th className="px-4 py-2 text-left">Price</th>
               <th className="px-4 py-2 text-left">Subtotal</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y" style={{borderColor:'var(--color-border)'}}>
             {order.products.map((p, i) => (
-              <tr key={i}>
+              <tr key={i} className="table-row">
                 <td className="px-4 py-2">{p.name}</td>
                 <td className="px-4 py-2">{p.quantity}</td>
                 <td className="px-4 py-2">${p.price}</td>
@@ -136,14 +137,14 @@ export default function OrderDetails() {
         </table>
       </div>
       <div className="mt-6 flex gap-3">
-          <button onClick={() => updateStatus("refused")} disabled={updating} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:opacity-50">
-            Refuse
+          <button onClick={() => updateStatus("refused")} disabled={updating} className="btn btn-danger">
+            <XCircle size={16} /> Refuse
           </button>
-          <button onClick={() => updateStatus("shipping")} disabled={updating} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50">
-            Shipping
+          <button onClick={() => updateStatus("shipping")} disabled={updating} className="btn btn-primary">
+            <Truck size={16} /> Shipping
           </button>
-          <button onClick={() => updateStatus("delivered")} disabled={updating} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50">
-            Delivered
+          <button onClick={() => updateStatus("delivered")} disabled={updating} className="btn btn-primary">
+            <CheckCircle2 size={16} /> Delivered
           </button>
         </div>
     </div>

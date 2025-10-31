@@ -1,3 +1,126 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@theme {
+    --color-primary: #7c3aed;
+    /* violet-600 */
+    --color-primary-foreground: #ffffff;
+    --color-secondary: #0ea5e9;
+    /* sky-500 */
+    --color-accent: #f59e0b;
+    /* amber-500 */
+    --color-success: #22c55e;
+    /* green-500 */
+    --color-warning: #f59e0b;
+    /* amber-500 */
+    --color-danger: #ef4444;
+    /* red-500 */
+    --color-muted: #cbd5e1;
+    /* slate-300 (lighter for readability) */
+
+    --color-bg: #0b1020;
+    /* dark background */
+    --color-surface: #111827;
+    /* gray-900 */
+    --color-card: #1f2937;
+    /* gray-800 */
+    --color-border: #2d3748;
+    /* slate-ish border */
+    --color-heading: #ffffff;
+    --color-text: #f3f4f6;
+}
+
+/* Base theming helpers */
+.bg-app {
+    background-color: var(--color-bg);
+}
+
+.bg-surface {
+    background-color: var(--color-surface);
+}
+
+.bg-card {
+    background-color: var(--color-card);
+}
+
+.text-heading {
+    color: var(--color-heading);
+}
+
+.text-body {
+    color: var(--color-text);
+}
+
+.text-muted {
+    color: var(--color-muted);
+}
+
+.btn {
+    @apply inline-flex items-center gap-2 rounded-md px-4 py-2 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:opacity-60 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+}
+
+.btn-primary:hover {
+    filter: brightness(1.05);
+}
+
+.btn-danger {
+    background-color: var(--color-danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    filter: brightness(0.95);
+}
+
+.card {
+    @apply rounded-xl shadow-lg;
+    background-color: var(--color-card);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+
+.table-header {
+    background-color: color-mix(in oklab, var(--color-card), white 3%);
+    color: var(--color-text);
+}
+
+.table-row {
+    @apply hover:bg-gray-800/60 transition-colors;
+}
+
+/* Status chips */
+.chip {
+    @apply px-2 py-1 rounded text-xs font-semibold;
+}
+
+.chip-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.chip-completed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.chip-default {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+/* Typography */
+body {
+    color: var(--color-text);
+}
+
+h1,
+h2,
+h3,
+h4 {
+    color: var(--color-heading);
+}
