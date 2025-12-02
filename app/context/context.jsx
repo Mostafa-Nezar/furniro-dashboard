@@ -15,7 +15,7 @@ export function AppProvider({ children }) {
   const fetchUsers = async () => {
     try {
       const res = await fetch(
-        "https://furniro-back-production.up.railway.app/api/admin/users",
+        "https://furniro-back-production.up.railway.app/api/users",
         {
           headers: {
             "Content-Type": "application/json",
