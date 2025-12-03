@@ -45,12 +45,12 @@ export default function AdminRegister() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-app p-6">
+    <div className="min-h-screen flex items-center justify-center bg-app p-4 sm:p-6">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md card p-8 space-y-5"
+        className="w-full max-w-md card p-6 sm:p-8 space-y-4 sm:space-y-5"
       >
-        <h1 className="text-2xl font-bold text-center text-heading">Admin Register</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-center text-heading">Admin Register</h1>
 
         {Object.keys(form).map((key) =>
           key !== "role" ? (

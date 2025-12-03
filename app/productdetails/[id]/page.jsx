@@ -23,32 +23,32 @@ export default function ProductDetails() {
     );
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-3 sm:p-4 lg:p-6 max-w-6xl mx-auto">
       <button
         onClick={() => router.back()}
-        className="btn btn-primary mb-6 inline-flex items-center gap-2"
+        className="btn btn-primary mb-4 sm:mb-6 inline-flex items-center gap-2 text-sm sm:text-base px-3 sm:px-4 py-2"
       >
-        <ArrowLeft size={16} /> Back to Products
+        <ArrowLeft size={14} className="sm:w-4 sm:h-4" /> <span className="hidden sm:inline">Back to Products</span><span className="sm:hidden">Back</span>
       </button>
 
       {/* العنوان والوصف */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-heading mb-3">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-heading mb-2 sm:mb-3">
           {product.name}
         </h1>
-        <p className="text-body text-lg">{product.des}</p>
+        <p className="text-body text-base sm:text-lg">{product.des}</p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-10">
+      <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-10">
         {/* قسم الصور */}
         <div className="flex-1">
-          <div className="card p-4 flex flex-col items-center">
+          <div className="card p-3 sm:p-4 flex flex-col items-center">
             <img
               src={selectedImage}
               alt={product.name}
-              className="w-full h-96 object-contain rounded-lg mb-4"
+              className="w-full h-64 sm:h-80 lg:h-96 object-contain rounded-lg mb-3 sm:mb-4"
             />
-            <div className="flex gap-3 overflow-x-auto py-2">
+            <div className="flex gap-2 sm:gap-3 overflow-x-auto py-2 w-full">
               {[
                 product.image,
                 product.image1,
@@ -62,7 +62,7 @@ export default function ProductDetails() {
                     key={i}
                     src={img}
                     alt={`img-${i}`}
-                    className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-4 transition-all ${
+                    className={`w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg cursor-pointer border-2 sm:border-4 transition-all flex-shrink-0 ${
                       selectedImage === img
                         ? "border-indigo-500 scale-105"
                         : "border-gray-600"
@@ -75,9 +75,9 @@ export default function ProductDetails() {
         </div>
 
         {/* قسم التفاصيل */}
-        <div className="flex-1 space-y-6">
-          <div className="card p-6 space-y-3">
-            <p className="text-2xl font-semibold text-heading">
+        <div className="flex-1 space-y-4 sm:space-y-6">
+          <div className="card p-4 sm:p-6 space-y-2 sm:space-y-3">
+            <p className="text-xl sm:text-2xl font-semibold text-heading">
               Price: ${product.price}
             </p>
             {product.sale && (
@@ -113,10 +113,10 @@ export default function ProductDetails() {
             .map(([title, obj], idx) => (
               <div
                 key={idx}
-                className="bg-surface p-5 rounded-xl space-y-2 border"
+                className="bg-surface p-4 sm:p-5 rounded-xl space-y-2 border"
                 style={{borderColor:'var(--color-border)'}}
               >
-                <h2 className="text-lg font-bold text-heading border-b pb-2 mb-2"
+                <h2 className="text-base sm:text-lg font-bold text-heading border-b pb-2 mb-2"
                   style={{borderColor:'var(--color-border)'}}
                 >
                   {title}

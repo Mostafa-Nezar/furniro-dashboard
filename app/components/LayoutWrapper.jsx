@@ -1,7 +1,16 @@
 "use client";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Home, Package, Users, ShoppingCart, LogOut } from "lucide-react";
+import {
+  Home,
+  Package,
+  Users,
+  ShoppingCart,
+  LogOut,
+  Menu,
+  X,
+} from "lucide-react";
 import ProtectedRoute from "./ProtectedRoute";
 import { useAppContext } from "../context/context";
 import { useRouter } from "next/navigation";
@@ -10,6 +19,7 @@ export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
   const { user, logout, isAuthenticated } = useAppContext();
   const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Pages that don't need authentication
   const publicPages = ["/login", "/register"];
@@ -20,6 +30,23 @@ export default function LayoutWrapper({ children }) {
     router.push("/login");
   };
 
+  // Close sidebar when route changes on mobile
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [sidebarOpen]);
+
   // For public pages (login/register), show minimal layout
   if (isPublicPage) {
     return <>{children}</>;
@@ -29,11 +56,29 @@ export default function LayoutWrapper({ children }) {
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen bg-app text-body">
+        {/* Mobile Overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         {/* Sidebar */}
         <aside
-          className="w-64 bg-surface text-body p-4 flex flex-col border-r"
+          className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-surface text-body p-4 flex flex-col border-r transform transition-transform duration-300 ease-in-out ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          }`}
           style={{ borderColor: "var(--color-border)" }}
         >
+          {/* Close button for mobile */}
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden absolute top-4 right-4 p-2 hover:bg-gray-800/60 rounded-md"
+          >
+            <X size={20} />
+          </button>
+
           <div className="flex items-center gap-2 mb-6">
             <img
               src="https://res.cloudinary.com/dutetsivc/image/upload/v1760013317/logo_ikqv7r.png"
@@ -97,7 +142,7 @@ export default function LayoutWrapper({ children }) {
               style={{ borderColor: "var(--color-border)" }}
             >
               <div className="px-3 py-2 mb-2">
-                <p className="text-sm font-semibold text-heading">
+                <p className="text-sm font-semibold text-heading truncate">
                   {user.name || user.email}
                 </p>
                 <p className="text-xs text-muted">{user.role}</p>
@@ -114,16 +159,26 @@ export default function LayoutWrapper({ children }) {
         </aside>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col w-full lg:w-auto">
           {/* Navbar */}
           <header
-            className="p-4 border-b bg-surface"
+            className="p-3 lg:p-4 border-b bg-surface flex items-center gap-3"
             style={{ borderColor: "var(--color-border)" }}
           >
-            <h1 className="text-lg font-semibold text-heading">Admin Panel</h1>
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 hover:bg-gray-800/60 rounded-md"
+            >
+              <Menu size={20} />
+            </button>
+            <h1 className="text-base lg:text-lg font-semibold text-heading">
+              Admin Panel
+            </h1>
           </header>
 
-          <main className="p-6 flex-1 bg-app">{children}</main>
+          <main className="p-3 sm:p-4 lg:p-6 flex-1 bg-app overflow-x-auto">
+            {children}
+          </main>
         </div>
       </div>
     </ProtectedRoute>

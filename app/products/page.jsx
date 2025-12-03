@@ -74,11 +74,11 @@ export default function AddProductForm() {
   return (
     <form
   onSubmit={handleSubmit}
-  className="flex flex-col gap-4 max-w-2xl mx-auto p-6 card"
+  className="flex flex-col gap-4 max-w-2xl mx-auto p-4 sm:p-6 card"
 >
-  <h2 className="text-2xl font-bold mb-4 text-heading">Add Product</h2>
+  <h2 className="text-xl sm:text-2xl font-bold mb-4 text-heading">Add Product</h2>
 
-  <div className="grid grid-cols-2 gap-4">
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
     <input
       type="text"
       name="id"
@@ -134,7 +134,7 @@ export default function AddProductForm() {
     style={{borderColor:'var(--color-border)'}}
   />
 
-  <div className="grid grid-cols-2 gap-4">
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
     <textarea
       name="general"
       placeholder="General JSON"
@@ -165,7 +165,7 @@ export default function AddProductForm() {
     />
   </div>
 
-  <div className="grid grid-cols-2 gap-4">
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
     <input
       type="number"
       name="sale"
@@ -201,12 +201,12 @@ export default function AddProductForm() {
   </div>
 
   <div>
-    <div className="grid grid-cols-2 gap-2 text-body">
-      <input type="file" name="image" onChange={handleImageChange} />
-      <input type="file" name="image1" onChange={handleImageChange} />
-      <input type="file" name="image2" onChange={handleImageChange} />
-      <input type="file" name="image3" onChange={handleImageChange} />
-      <input type="file" name="image4" onChange={handleImageChange} />
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-body">
+      <input type="file" name="image" onChange={handleImageChange} className="text-sm" />
+      <input type="file" name="image1" onChange={handleImageChange} className="text-sm" />
+      <input type="file" name="image2" onChange={handleImageChange} className="text-sm" />
+      <input type="file" name="image3" onChange={handleImageChange} className="text-sm" />
+      <input type="file" name="image4" onChange={handleImageChange} className="text-sm" />
     </div>
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"  stroke="currentColor" width="24" height="24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />

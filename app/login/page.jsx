@@ -55,12 +55,12 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-app p-6">
+    <div className="min-h-screen flex items-center justify-center bg-app p-4 sm:p-6">
       <form
         onSubmit={handleSubmit}
-        className="max-w-md w-full card p-8 space-y-5"
+        className="max-w-md w-full card p-6 sm:p-8 space-y-4 sm:space-y-5"
       >
-        <h1 className="text-2xl font-bold text-center text-heading">
+        <h1 className="text-xl sm:text-2xl font-bold text-center text-heading">
           Admin Login
         </h1>
 

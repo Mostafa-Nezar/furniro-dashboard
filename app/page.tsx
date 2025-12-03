@@ -10,22 +10,22 @@ export default function DashboardPage() {
 
   const totalRevenue = orders.reduce((sum: number, order: { total?: number }) => sum + (order.total || 0), 0);
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
-      <div className="p-6 card">
-        <h2 className="text-xl font-bold">Total Orders</h2>
-        <p className="mt-2 text-3xl font-semibold" style={{color: 'var(--color-primary)'}}>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="p-4 sm:p-6 card">
+        <h2 className="text-lg sm:text-xl font-bold">Total Orders</h2>
+        <p className="mt-2 text-2xl sm:text-3xl font-semibold" style={{color: 'var(--color-primary)'}}>
           {orders.length}
         </p>
       </div>
-      <div className="p-6 card">
-        <h2 className="text-xl font-bold">Total Users</h2>
-        <p className="mt-2 text-3xl font-semibold" style={{color: 'var(--color-success)'}}>
+      <div className="p-4 sm:p-6 card">
+        <h2 className="text-lg sm:text-xl font-bold">Total Users</h2>
+        <p className="mt-2 text-2xl sm:text-3xl font-semibold" style={{color: 'var(--color-success)'}}>
           {usersData.length}
         </p>
       </div>
-      <div className="p-6 card">
-        <h2 className="text-xl font-bold">Revenue</h2>
-        <p className="mt-2 text-3xl font-semibold" style={{color: 'var(--color-accent)'}}>
+      <div className="p-4 sm:p-6 card sm:col-span-2 lg:col-span-1">
+        <h2 className="text-lg sm:text-xl font-bold">Revenue</h2>
+        <p className="mt-2 text-2xl sm:text-3xl font-semibold" style={{color: 'var(--color-accent)'}}>
           ${totalRevenue.toLocaleString()}
         </p>
       </div>

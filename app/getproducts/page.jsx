@@ -8,9 +8,9 @@ export default function Products() {
   const router = useRouter();
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-center text-heading">Products List</h1>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="max-w-5xl mx-auto">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-heading">Products List</h1>
+      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => (
           <div
             key={product.id}
@@ -64,20 +64,20 @@ export default function Products() {
             </div>
 
             {/* الأزرار */}
-            <div className="flex gap-3 px-5 py-4 bg-surface border-t" style={{borderColor:'var(--color-border)'}}>
+            <div className="flex gap-2 sm:gap-3 px-4 sm:px-5 py-3 sm:py-4 bg-surface border-t" style={{borderColor:'var(--color-border)'}}>
               <button
                 onClick={() => router.push(`/editproduct/${product.id}`)}
-                className="btn btn-primary flex-1 justify-center"
+                className="btn btn-primary flex-1 justify-center text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2"
                 title="Edit product"
               >
-                <Edit size={16} /> Edit
+                <Edit size={14} className="sm:w-4 sm:h-4" /> <span className="hidden sm:inline">Edit</span>
               </button>
               <button
                 onClick={() => deleteProduct(product.id)}
-                className="btn btn-danger flex-1 justify-center"
+                className="btn btn-danger flex-1 justify-center text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2"
                 title="Delete product"
               >
-                <Trash2 size={16} /> Delete
+                <Trash2 size={14} className="sm:w-4 sm:h-4" /> <span className="hidden sm:inline">Delete</span>
               </button>
             </div>
           </div>

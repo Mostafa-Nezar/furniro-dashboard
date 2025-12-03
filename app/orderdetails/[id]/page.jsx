@@ -54,44 +54,44 @@ export default function OrderDetails() {
     });
 
   return (
-    <div className="p-6 min-h-screen">
+    <div className="p-3 sm:p-4 lg:p-6 min-h-screen">
       <button
         onClick={() => router.back()}
-        className="btn btn-primary mb-6 inline-flex items-center gap-2"
+        className="btn btn-primary mb-4 sm:mb-6 inline-flex items-center gap-2 text-sm sm:text-base px-3 sm:px-4 py-2"
       >
-        <ArrowLeft size={16} /> Back to Orders
+        <ArrowLeft size={14} className="sm:w-4 sm:h-4" /> <span className="hidden sm:inline">Back to Orders</span><span className="sm:hidden">Back</span>
       </button>
 
-      <h2 className="text-2xl font-bold mb-6 text-heading">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-heading break-all">
         Order #{order._id}
       </h2>
 
-      <div className="card p-6 mb-6">
-        <h3 className="text-lg font-semibold mb-4 text-heading">
+      <div className="card p-4 sm:p-6 mb-4 sm:mb-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-heading">
           Customer Information
         </h3>
-        <p>
-          <strong className="text-heading">Name:</strong> {order.customerInfo?.fullName}
+        <p className="text-sm sm:text-base mb-2">
+          <strong className="text-heading">Name:</strong> <span className="text-body">{order.customerInfo?.fullName}</span>
         </p>
-        <p>
-          <strong className="text-heading">Email:</strong> {order.customerInfo?.email}
+        <p className="text-sm sm:text-base mb-2 break-all">
+          <strong className="text-heading">Email:</strong> <span className="text-body">{order.customerInfo?.email}</span>
         </p>
-        <p>
-          <strong className="text-heading">Address:</strong> {order.customerInfo?.address}
+        <p className="text-sm sm:text-base mb-2">
+          <strong className="text-heading">Address:</strong> <span className="text-body">{order.customerInfo?.address}</span>
         </p>
-                <p>
-          <strong className="text-heading">phone:</strong> {order.customerInfo?.phoneNumber}
+        <p className="text-sm sm:text-base">
+          <strong className="text-heading">Phone:</strong> <span className="text-body">{order.customerInfo?.phoneNumber}</span>
         </p>
       </div>
 
-      <div className="card p-6 mb-6">
-        <h3 className="text-lg font-semibold mb-4 text-heading">
+      <div className="card p-4 sm:p-6 mb-4 sm:mb-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-heading">
           Order Details
         </h3>
-        <p>
+        <p className="text-sm sm:text-base mb-2">
           <strong className="text-heading">Status:</strong>{" "}
           <span
-            className={`chip ${
+            className={`chip text-xs sm:text-sm ${
               order.status === "pending"
                 ? "chip-pending"
                 : order.status === "completed"
@@ -104,47 +104,49 @@ export default function OrderDetails() {
             {order.status}
           </span>
         </p>
-        <p>
-          <strong className="text-heading">Date:</strong> {formatDate(order.date)}
+        <p className="text-sm sm:text-base mb-2">
+          <strong className="text-heading">Date:</strong> <span className="text-body">{formatDate(order.date)}</span>
         </p>
-        <p>
-          <strong className="text-heading">Total:</strong> ${order.total}
+        <p className="text-sm sm:text-base">
+          <strong className="text-heading">Total:</strong> <span className="text-body">${order.total}</span>
         </p>
       </div>
-      <div className="card p-6">
-        <h3 className="text-lg font-semibold mb-4 text-heading">Products</h3>
-        <table className="min-w-full border-collapse rounded-lg overflow-hidden">
-          <thead>
-            <tr className="table-header text-sm">
-              <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Quantity</th>
-              <th className="px-4 py-2 text-left">Price</th>
-              <th className="px-4 py-2 text-left">Subtotal</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y" style={{borderColor:'var(--color-border)'}}>
-            {order.products.map((p, i) => (
-              <tr key={i} className="table-row">
-                <td className="px-4 py-2">{p.name}</td>
-                <td className="px-4 py-2">{p.quantity}</td>
-                <td className="px-4 py-2">${p.price}</td>
-                <td className="px-4 py-2 font-semibold">
-                  ${p.price * p.quantity}
-                </td>
+      <div className="card p-4 sm:p-6 mb-4 sm:mb-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-heading">Products</h3>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse rounded-lg overflow-hidden">
+            <thead>
+              <tr className="table-header text-xs sm:text-sm">
+                <th className="px-3 sm:px-4 py-2 text-left">Name</th>
+                <th className="px-3 sm:px-4 py-2 text-left">Quantity</th>
+                <th className="px-3 sm:px-4 py-2 text-left">Price</th>
+                <th className="px-3 sm:px-4 py-2 text-left">Subtotal</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y" style={{borderColor:'var(--color-border)'}}>
+              {order.products.map((p, i) => (
+                <tr key={i} className="table-row">
+                  <td className="px-3 sm:px-4 py-2 text-xs sm:text-sm">{p.name}</td>
+                  <td className="px-3 sm:px-4 py-2 text-xs sm:text-sm">{p.quantity}</td>
+                  <td className="px-3 sm:px-4 py-2 text-xs sm:text-sm">${p.price}</td>
+                  <td className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold">
+                    ${p.price * p.quantity}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div className="mt-6 flex gap-3">
-          <button onClick={() => updateStatus("refused")} disabled={updating} className="btn btn-danger">
-            <XCircle size={16} /> Refuse
+      <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-2 sm:gap-3">
+          <button onClick={() => updateStatus("refused")} disabled={updating} className="btn btn-danger text-sm sm:text-base px-3 sm:px-4 py-2">
+            <XCircle size={14} className="sm:w-4 sm:h-4" /> Refuse
           </button>
-          <button onClick={() => updateStatus("shipping")} disabled={updating} className="btn btn-primary">
-            <Truck size={16} /> Shipping
+          <button onClick={() => updateStatus("shipping")} disabled={updating} className="btn btn-primary text-sm sm:text-base px-3 sm:px-4 py-2">
+            <Truck size={14} className="sm:w-4 sm:h-4" /> Shipping
           </button>
-          <button onClick={() => updateStatus("delivered")} disabled={updating} className="btn btn-primary">
-            <CheckCircle2 size={16} /> Delivered
+          <button onClick={() => updateStatus("delivered")} disabled={updating} className="btn btn-primary text-sm sm:text-base px-3 sm:px-4 py-2">
+            <CheckCircle2 size={14} className="sm:w-4 sm:h-4" /> Delivered
           </button>
         </div>
     </div>

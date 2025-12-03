@@ -84,14 +84,14 @@ export default function EditProduct() {
   if (!product) return <p className="text-center py-6 text-muted">Loading...</p>;
 
   return (
-    <div className="max-w-3xl mx-auto p-8 card">
-      <h1 className="text-3xl font-bold mb-6 text-center text-heading">
+    <div className="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 card">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-heading">
         Edit Product
       </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
         {/* الاسم والسعر */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input
             type="text"
             name="name"
@@ -121,14 +121,14 @@ export default function EditProduct() {
           className="rounded-lg p-3 w-full h-24 bg-surface border focus:outline-none focus:ring-2"
           style={{borderColor:'var(--color-border)'}}
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input
             type="number"
             name="quantity"
             placeholder="Quantity"
             value={formData.quantity}
             onChange={handleChange}
-            className="rounded-lg p-3 w-full bg-surface border focus:outline-none focus:ring-2"
+            className="rounded-lg p-3 w-full bg-surface border focus:outline-none focus:ring-2 text-sm sm:text-base"
             style={{borderColor:'var(--color-border)'}}
           />
           <input
@@ -137,7 +137,7 @@ export default function EditProduct() {
             placeholder="Sale"
             value={formData.sale}
             onChange={handleChange}
-            className="rounded-lg p-3 w-full bg-surface border focus:outline-none focus:ring-2"
+            className="rounded-lg p-3 w-full bg-surface border focus:outline-none focus:ring-2 text-sm sm:text-base"
             style={{borderColor:'var(--color-border)'}}
           />
         </div>
@@ -145,14 +145,14 @@ export default function EditProduct() {
         {/* الـ JSON Fields */}
         {["general", "myproduct", "dimensions", "warranty"].map((field) => (
           <div key={field}>
-            <label className="block mb-2 font-semibold text-heading">
+            <label className="block mb-2 text-sm sm:text-base font-semibold text-heading">
               {field.charAt(0).toUpperCase() + field.slice(1)} (JSON)
             </label>
             <textarea
               name={field}
               value={formData[field]}
               onChange={handleChange}
-              className="rounded-lg p-3 w-full h-24 bg-surface border focus:outline-none focus:ring-2"
+              className="rounded-lg p-3 w-full h-24 bg-surface border focus:outline-none focus:ring-2 text-sm sm:text-base"
               style={{borderColor:'var(--color-border)'}}
             />
           </div>
@@ -160,17 +160,17 @@ export default function EditProduct() {
 
         {/* Images */}
         <div>
-          <label className="block mb-2 font-semibold text-heading">
+          <label className="block mb-2 text-sm sm:text-base font-semibold text-heading">
             Images
           </label>
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
             {["image", "image1", "image2", "image3", "image4"].map((img) => (
               <input
                 key={img}
                 type="file"
                 name={img}
                 onChange={handleChange}
-                className="rounded-lg p-2 bg-surface border focus:outline-none focus:ring-2"
+                className="rounded-lg p-2 bg-surface border focus:outline-none focus:ring-2 text-xs sm:text-sm"
                 style={{borderColor:'var(--color-border)'}}
               />
             ))}
