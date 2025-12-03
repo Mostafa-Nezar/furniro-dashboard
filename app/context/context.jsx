@@ -8,6 +8,47 @@ export function AppProvider({ children }) {
   const [orders, setOrders] = useState([]);
   const [products, setproducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  const logout = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("adminUser");
+      localStorage.removeItem("adminToken");
+      setUser(null);
+      setIsAuthenticated(false);
+    }
+  };
+
+  const login = (userData, token) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("adminUser", JSON.stringify(userData));
+      localStorage.setItem("adminToken", token);
+      setUser(userData);
+      setIsAuthenticated(true);
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedUser = localStorage.getItem("adminUser");
+      const token = localStorage.getItem("adminToken");
+
+      if (savedUser && token) {
+        try {
+          setUser(JSON.parse(savedUser));
+          setIsAuthenticated(true);
+        } catch (err) {
+          console.error("Error parsing user data:", err);
+          logout();
+        }
+      }
+      setAuthLoading(false);
+    } else {
+      setAuthLoading(false);
+    }
+  }, []);
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("adminToken") : "";
@@ -76,12 +117,15 @@ export function AppProvider({ children }) {
       alert(err.message);
     }
   };
-    const deleteProduct = async (id) => {
+  const deleteProduct = async (id) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
       setLoading(true);
-      const res = await fetch(`https://furniro-back-production.up.railway.app/api/products/${id}/delete`, { method: "DELETE" });
+      const res = await fetch(
+        `https://furniro-back-production.up.railway.app/api/products/${id}/delete`,
+        { method: "DELETE" }
+      );
       const data = await res.json();
 
       if (data.success) {
@@ -118,28 +162,30 @@ export function AppProvider({ children }) {
     }
   };
   const deleteOrder = async (id) => {
-  try {
-    const res = await fetch(`https://furniro-back-production.up.railway.app/api/orders/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `https://furniro-back-production.up.railway.app/api/orders/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
 
-    if (res.ok) {
-      setOrders(orders.filter((order) => order._id !== id));
-    } else {
-      alert(data.error || "Error deleting order");
+      if (res.ok) {
+        setOrders(orders.filter((order) => order._id !== id));
+      } else {
+        alert(data.error || "Error deleting order");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error while deleting order");
     }
-  } catch (err) {
-    console.error(err);
-    alert("Server error while deleting order");
-  }
-};
+  };
 
-  
   useEffect(() => {
     fetchUsers();
     fetchOrders();
@@ -153,11 +199,16 @@ export function AppProvider({ children }) {
         orders,
         products,
         loading,
+        user,
+        isAuthenticated,
+        authLoading,
+        login,
+        logout,
         fetchUsers,
         fetchOrders,
         handleDeleteUser,
         deleteProduct,
-        deleteOrder
+        deleteOrder,
       }}
     >
       {children}
