@@ -29,11 +29,11 @@ export default function Users() {
                   key={user._id}
                   className="table-row"
                 >
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 truncate max-w-[80px] sm:max-w-none">{user.id}</td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-400 truncate max-w-[80px] sm:max-w-none">{user.id}</td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-800 truncate max-w-[120px] sm:max-w-none">
                     {user.name}
                   </td>
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 hidden md:table-cell truncate">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-400 hidden md:table-cell truncate">
                     {user.email}
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 text-center">

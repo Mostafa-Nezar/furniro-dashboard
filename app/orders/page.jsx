@@ -42,11 +42,11 @@ export default function Orders() {
                 className="table-row cursor-pointer"
               >
                 <td 
-                className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 truncate max-w-[100px] sm:max-w-none"
+                className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-400 truncate max-w-[100px] sm:max-w-none"
                 onClick={() => router.push(`/orderdetails/${order._id}`)}
                 title={order._id}
                 >{order._id}</td>
-                <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-800 hidden sm:table-cell">
+                <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-400 hidden sm:table-cell">
                   {order.customerInfo?.fullName}
                 </td>
                 <td className="px-3 sm:px-6 py-3 sm:py-4">
