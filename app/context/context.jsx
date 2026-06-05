@@ -118,13 +118,16 @@ export function AppProvider({ children }) {
     }
   };
   const deleteProduct = async (id) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
-
     try {
       setLoading(true);
       const res = await fetch(
         `https://furniro-back-production.up.railway.app/api/products/${id}/delete`,
-        { method: "DELETE" }
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
       );
       const data = await res.json();
 
