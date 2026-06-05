@@ -17,7 +17,7 @@ export default function ProductDetails() {
 
   if (!product)
     return (
-      <p className="text-center mt-10" style={{color:'#ef4444', fontWeight:600}}>
+      <p className="text-center mt-10" style={{ color: '#ef4444', fontWeight: 600 }}>
         Product not found
       </p>
     );
@@ -33,10 +33,19 @@ export default function ProductDetails() {
 
       {/* العنوان والوصف */}
       <div className="mb-6 sm:mb-8">
+        <div className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950 px-3 py-1 text-sm text-slate-200 mb-3">
+          <span className="font-semibold">Key:</span>
+          <span>{product.key || "-"}</span>
+        </div>
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-heading mb-2 sm:mb-3">
           {product.name}
         </h1>
         <p className="text-body text-base sm:text-lg">{product.des}</p>
+        {product.not && (
+          <p className="mt-3 rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-300">
+            <span className="font-semibold text-slate-100">Notes:</span> {product.not}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-10">
@@ -62,11 +71,10 @@ export default function ProductDetails() {
                     key={i}
                     src={img}
                     alt={`img-${i}`}
-                    className={`w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg cursor-pointer border-2 sm:border-4 transition-all flex-shrink-0 ${
-                      selectedImage === img
+                    className={`w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg cursor-pointer border-2 sm:border-4 transition-all flex-shrink-0 ${selectedImage === img
                         ? "border-indigo-500 scale-105"
                         : "border-gray-600"
-                    } hover:border-indigo-400 hover:scale-105`}
+                      } hover:border-indigo-400 hover:scale-105`}
                     onClick={() => setSelectedImage(img)}
                   />
                 ))}
@@ -81,7 +89,7 @@ export default function ProductDetails() {
               Price: ${product.price}
             </p>
             {product.sale && (
-              <p className="font-bold text-lg" style={{color:'#ef4444'}}>
+              <p className="font-bold text-lg" style={{ color: '#ef4444' }}>
                 Sale: {product.sale}% off
               </p>
             )}
@@ -114,10 +122,10 @@ export default function ProductDetails() {
               <div
                 key={idx}
                 className="bg-surface p-4 sm:p-5 rounded-xl space-y-2 border"
-                style={{borderColor:'var(--color-border)'}}
+                style={{ borderColor: 'var(--color-border)' }}
               >
                 <h2 className="text-base sm:text-lg font-bold text-heading border-b pb-2 mb-2"
-                  style={{borderColor:'var(--color-border)'}}
+                  style={{ borderColor: 'var(--color-border)' }}
                 >
                   {title}
                 </h2>
@@ -129,6 +137,19 @@ export default function ProductDetails() {
                 ))}
               </div>
             ))}
+          {product.customAttributes && Object.keys(product.customAttributes).length > 0 && (
+            <div className="bg-surface p-4 sm:p-5 rounded-xl space-y-2 border" style={{ borderColor: 'var(--color-border)' }}>
+              <h2 className="text-base sm:text-lg font-bold text-heading border-b pb-2 mb-2" style={{ borderColor: 'var(--color-border)' }}>
+                Custom Attributes
+              </h2>
+              {Object.entries(product.customAttributes).map(([key, val]) => (
+                <p key={key}>
+                  <span className="font-semibold text-heading">{key}: </span>
+                  <span className="text-body">{val}</span>
+                </p>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
