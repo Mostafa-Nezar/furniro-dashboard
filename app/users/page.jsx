@@ -18,7 +18,6 @@ export default function Users() {
               <th className="px-3 sm:px-6 py-2 sm:py-3 text-left">ID</th>
               <th className="px-3 sm:px-6 py-2 sm:py-3 text-left">Name</th>
               <th className="px-3 sm:px-6 py-2 sm:py-3 text-left hidden md:table-cell">Email</th>
-              <th className="px-3 sm:px-6 py-2 sm:py-3 text-center">Admin</th>
               <th className="px-3 sm:px-6 py-2 sm:py-3 text-center">Actions</th>
             </tr>
           </thead>
@@ -35,17 +34,6 @@ export default function Users() {
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-400 hidden md:table-cell truncate">
                     {user.email}
-                  </td>
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-center">
-                    {user.Admin ? (
-                      <span className="chip chip-completed inline-flex items-center gap-1 text-xs">
-                        <CheckCircle2 size={12} className="sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Yes</span>
-                      </span>
-                    ) : (
-                      <span className="chip chip-default inline-flex items-center gap-1 text-xs" style={{background:'#fee2e2', color:'#991b1b'}}>
-                        <XCircle size={12} className="sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">No</span>
-                      </span>
-                    )}
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 text-center">
                     <button

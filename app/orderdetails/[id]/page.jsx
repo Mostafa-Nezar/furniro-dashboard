@@ -13,7 +13,7 @@ export default function OrderDetails() {
   const updateStatus = async (newStatus) => {
     try {
       setUpdating(true);
-      const res = await fetch(`https://furniro-back-production.up.railway.app/api/orders/${id}/status`, {
+      const res = await fetch(`http://localhost:3001/api/orders/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -91,15 +91,14 @@ export default function OrderDetails() {
         <p className="text-sm sm:text-base mb-2">
           <strong className="text-heading">Status:</strong>{" "}
           <span
-            className={`chip text-xs sm:text-sm ${
-              order.status === "pending"
-                ? "chip-pending"
-                : order.status === "completed"
+            className={`chip text-xs sm:text-sm ${order.status === "pending"
+              ? "chip-pending"
+              : order.status === "completed"
                 ? "chip-completed"
                 : order.status === "refused"
-                ? "chip-default"
-                : "chip-default"
-            }`}
+                  ? "chip-default"
+                  : "chip-default"
+              }`}
           >
             {order.status}
           </span>
@@ -123,7 +122,7 @@ export default function OrderDetails() {
                 <th className="px-3 sm:px-4 py-2 text-left">Subtotal</th>
               </tr>
             </thead>
-            <tbody className="divide-y" style={{borderColor:'var(--color-border)'}}>
+            <tbody className="divide-y" style={{ borderColor: 'var(--color-border)' }}>
               {order.products.map((p, i) => (
                 <tr key={i} className="table-row">
                   <td className="px-3 sm:px-4 py-2 text-xs sm:text-sm">{p.name}</td>
@@ -139,16 +138,16 @@ export default function OrderDetails() {
         </div>
       </div>
       <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-2 sm:gap-3">
-          <button onClick={() => updateStatus("refused")} disabled={updating} className="btn btn-danger text-sm sm:text-base px-3 sm:px-4 py-2">
-            <XCircle size={14} className="sm:w-4 sm:h-4" /> Refuse
-          </button>
-          <button onClick={() => updateStatus("shipping")} disabled={updating} className="btn btn-primary text-sm sm:text-base px-3 sm:px-4 py-2">
-            <Truck size={14} className="sm:w-4 sm:h-4" /> Shipping
-          </button>
-          <button onClick={() => updateStatus("delivered")} disabled={updating} className="btn btn-primary text-sm sm:text-base px-3 sm:px-4 py-2">
-            <CheckCircle2 size={14} className="sm:w-4 sm:h-4" /> Delivered
-          </button>
-        </div>
+        <button onClick={() => updateStatus("refused")} disabled={updating} className="btn btn-danger text-sm sm:text-base px-3 sm:px-4 py-2">
+          <XCircle size={14} className="sm:w-4 sm:h-4" /> Refuse
+        </button>
+        <button onClick={() => updateStatus("shipping")} disabled={updating} className="btn btn-primary text-sm sm:text-base px-3 sm:px-4 py-2">
+          <Truck size={14} className="sm:w-4 sm:h-4" /> Shipping
+        </button>
+        <button onClick={() => updateStatus("delivered")} disabled={updating} className="btn btn-primary text-sm sm:text-base px-3 sm:px-4 py-2">
+          <CheckCircle2 size={14} className="sm:w-4 sm:h-4" /> Delivered
+        </button>
+      </div>
     </div>
   );
 }

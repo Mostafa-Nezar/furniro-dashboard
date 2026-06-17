@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAppContext } from "../context/context";
 
 export default function AdminRegister() {
+  const { register } = useAppContext();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -22,23 +24,13 @@ export default function AdminRegister() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://furniro-back-production.up.railway.app/api/adminregister", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const data = await register(form);
 
-      const data = await res.json();
-      
-      if (res.ok) {
-        alert(data.msg || "تم التسجيل بنجاح");
-        router.push("/login");
-      } else {
-        alert(data.msg || "فشل التسجيل");
-      }
+      alert(data.msg || "تم التسجيل بنجاح");
+      router.push("/login");
     } catch (error) {
       console.error("Register error:", error);
-      alert("حدث خطأ أثناء التسجيل");
+      alert(error.data?.msg || error.message || "حدث خطأ أثناء التسجيل");
     } finally {
       setLoading(false);
     }
@@ -78,14 +70,14 @@ export default function AdminRegister() {
           <option value="superadmin" className="bg-surface text-body">Super Admin</option>
         </select>
 
-        <button 
+        <button
           type="submit"
           disabled={loading}
           className="btn btn-primary w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Loading..." : "Register"}
         </button>
-        
+
         <p className="text-center text-sm text-muted">
           already have account ?{" "}
           <a href="/login" className="text-primary hover:underline">

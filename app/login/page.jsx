@@ -24,10 +24,11 @@ export default function AdminLogin() {
 
     try {
       const res = await fetch(
-        "https://furniro-back-production.up.railway.app/api/adminlogin",
+        "http://localhost:3001/api/adminlogin",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(form),
         }
       );

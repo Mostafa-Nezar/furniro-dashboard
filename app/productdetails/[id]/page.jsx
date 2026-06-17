@@ -13,7 +13,7 @@ export default function ProductDetails() {
   const product = products.find(
     (p) => p.id.toString() === productId.toString()
   );
-  const [selectedImage, setSelectedImage] = useState(product?.image);
+  const [selectedImage, setSelectedImage] = useState(product?.images[0]);
 
   if (!product)
     return (
@@ -58,13 +58,7 @@ export default function ProductDetails() {
               className="w-full h-64 sm:h-80 lg:h-96 object-contain rounded-lg mb-3 sm:mb-4"
             />
             <div className="flex gap-2 sm:gap-3 overflow-x-auto py-2 w-full">
-              {[
-                product.image,
-                product.image1,
-                product.image2,
-                product.image3,
-                product.image4,
-              ]
+              {product.images
                 .filter(Boolean)
                 .map((img, i) => (
                   <img
