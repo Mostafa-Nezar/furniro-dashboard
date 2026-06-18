@@ -5,7 +5,8 @@ import { fetchInstance } from "./api";
 const AppContext = createContext();
 
 const initialState = {
-  usersData: [], orders: [],
+  usersData: [],
+  orders: [],
   products: [],
   categories: [],
   user: null,
@@ -15,7 +16,15 @@ const initialState = {
   authLoading: true,
   productForm: {
     formData: {
-      key: "", name: "", price: "", salePrice: "", category: "", des: "", not: "", sale: "", quantity: ""
+      key: "",
+      name: "",
+      price: "",
+      salePrice: "",
+      category: "",
+      des: "",
+      not: "",
+      sale: "",
+      quantity: "",
     },
     colorsList: [""],
     sizesList: [""],
@@ -25,7 +34,7 @@ const initialState = {
     warrantyFields: [{ key: "", value: "" }],
     customAttributes: [{ key: "", value: "" }],
     images: [],
-  }
+  },
 };
 
 export const ACTIONS = {
@@ -55,7 +64,6 @@ export const ACTIONS = {
   REMOVE_PRODUCT_STRING_ARRAY_ROW: "REMOVE_PRODUCT_STRING_ARRAY_ROW",
   RESET_PRODUCT_FORM: "RESET_PRODUCT_FORM",
 };
-
 
 function reducer(state, action) {
   switch (action.type) {
@@ -111,40 +119,76 @@ function reducer(state, action) {
         ...state,
         productForm: {
           ...state.productForm,
-          formData: { ...state.productForm.formData, [action.payload.name]: action.payload.value }
-        }
+          formData: {
+            ...state.productForm.formData,
+            [action.payload.name]: action.payload.value,
+          },
+        },
       };
     case ACTIONS.SET_ALL_PRODUCT_DATA:
       return { ...state, productForm: action.payload };
     case ACTIONS.SET_PRODUCT_IMAGES:
-      return { ...state, productForm: { ...state.productForm, images: action.payload } };
+      return {
+        ...state,
+        productForm: { ...state.productForm, images: action.payload },
+      };
     case ACTIONS.UPDATE_PRODUCT_FIELD: {
       const { section, index, field, value } = action.payload;
       const newFields = [...state.productForm[section]];
       newFields[index] = { ...newFields[index], [field]: value };
-      return { ...state, productForm: { ...state.productForm, [section]: newFields } };
+      return {
+        ...state,
+        productForm: { ...state.productForm, [section]: newFields },
+      };
     }
     case ACTIONS.ADD_PRODUCT_FIELD_ROW: {
       const { section } = action.payload;
-      return { ...state, productForm: { ...state.productForm, [section]: [...state.productForm[section], { key: "", value: "" }] } };
+      return {
+        ...state,
+        productForm: {
+          ...state.productForm,
+          [section]: [...state.productForm[section], { key: "", value: "" }],
+        },
+      };
     }
     case ACTIONS.REMOVE_PRODUCT_FIELD_ROW: {
       const { section, index } = action.payload;
-      return { ...state, productForm: { ...state.productForm, [section]: state.productForm[section].filter((_, i) => i !== index) } };
+      return {
+        ...state,
+        productForm: {
+          ...state.productForm,
+          [section]: state.productForm[section].filter((_, i) => i !== index),
+        },
+      };
     }
     case ACTIONS.UPDATE_PRODUCT_STRING_ARRAY: {
       const { section, index, value } = action.payload;
       const newList = [...state.productForm[section]];
       newList[index] = value;
-      return { ...state, productForm: { ...state.productForm, [section]: newList } };
+      return {
+        ...state,
+        productForm: { ...state.productForm, [section]: newList },
+      };
     }
     case ACTIONS.ADD_PRODUCT_STRING_ARRAY_ROW: {
       const { section } = action.payload;
-      return { ...state, productForm: { ...state.productForm, [section]: [...state.productForm[section], ""] } };
+      return {
+        ...state,
+        productForm: {
+          ...state.productForm,
+          [section]: [...state.productForm[section], ""],
+        },
+      };
     }
     case ACTIONS.REMOVE_PRODUCT_STRING_ARRAY_ROW: {
       const { section, index } = action.payload;
-      return { ...state, productForm: { ...state.productForm, [section]: state.productForm[section].filter((_, i) => i !== index) } };
+      return {
+        ...state,
+        productForm: {
+          ...state.productForm,
+          [section]: state.productForm[section].filter((_, i) => i !== index),
+        },
+      };
     }
     case ACTIONS.RESET_PRODUCT_FORM:
       return { ...state, productForm: initialState.productForm };
@@ -157,7 +201,6 @@ function reducer(state, action) {
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-
   const login = (userData) => {
     localStorage.setItem("adminUser", JSON.stringify(userData));
 
@@ -167,29 +210,42 @@ export function AppProvider({ children }) {
     });
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetchInstance("/adminlogout", { method: "POST" });
+    } catch (err) {
+      console.error("logout error:", err.message);
+    }
+
     localStorage.removeItem("adminUser");
     dispatch({ type: ACTIONS.LOGOUT });
   };
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("adminUser");
+    const verifySession = async () => {
+      const savedUser = localStorage.getItem("adminUser");
 
-    if (savedUser) {
+      if (!savedUser) {
+        dispatch({ type: ACTIONS.SET_AUTH_LOADING, payload: false });
+        return;
+      }
+
       try {
+        await fetchInstance("/categories");
         const user = JSON.parse(savedUser);
-
         dispatch({
           type: ACTIONS.SET_AUTH,
           payload: { user },
         });
-      } catch (err) {
-        console.error("Invalid user data");
-        logout();
+      } catch {
+        localStorage.removeItem("adminUser");
+        dispatch({ type: ACTIONS.LOGOUT });
+      } finally {
+        dispatch({ type: ACTIONS.SET_AUTH_LOADING, payload: false });
       }
-    }
+    };
 
-    dispatch({ type: ACTIONS.SET_AUTH_LOADING, payload: false });
+    verifySession();
   }, []);
 
   const fetchUsers = async () => {
@@ -234,7 +290,10 @@ export function AppProvider({ children }) {
         dispatch({ type: ACTIONS.ADD_CATEGORY, payload: res.category });
         return { success: true, category: res.category };
       }
-      return { success: false, message: res.message || "Failed to create category" };
+      return {
+        success: false,
+        message: res.message || "Failed to create category",
+      };
     } catch (err) {
       console.error("createCategory error:", err);
       return { success: false, message: err.message };
@@ -375,7 +434,13 @@ export function AppProvider({ children }) {
     }, {});
   };
 
-  const NESTED_PRODUCT_KEYS = ["general", "myproduct", "dimensions", "warranty", "customAttributes"];
+  const NESTED_PRODUCT_KEYS = [
+    "general",
+    "myproduct",
+    "dimensions",
+    "warranty",
+    "customAttributes",
+  ];
 
   const buildProductPayload = () => {
     const form = state.productForm;
@@ -387,9 +452,11 @@ export function AppProvider({ children }) {
     if (categoryValue) payload.category = categoryValue;
 
     if (form.formData.price !== "") payload.price = Number(form.formData.price);
-    if (form.formData.salePrice !== "") payload.salePrice = Number(form.formData.salePrice);
+    if (form.formData.salePrice !== "")
+      payload.salePrice = Number(form.formData.salePrice);
     if (form.formData.sale !== "") payload.sale = Number(form.formData.sale);
-    if (form.formData.quantity !== "") payload.quantity = Number(form.formData.quantity);
+    if (form.formData.quantity !== "")
+      payload.quantity = Number(form.formData.quantity);
     if (form.formData.des?.trim()) payload.des = form.formData.des.trim();
     if (form.formData.not?.trim()) payload.not = form.formData.not.trim();
 
@@ -424,10 +491,13 @@ export function AppProvider({ children }) {
     body.append("name", payload.name);
     if (payload.key) body.append("key", payload.key);
     if (payload.category) body.append("category", payload.category);
-    if (payload.price !== undefined) body.append("price", String(payload.price));
-    if (payload.salePrice !== undefined) body.append("salePrice", String(payload.salePrice));
+    if (payload.price !== undefined)
+      body.append("price", String(payload.price));
+    if (payload.salePrice !== undefined)
+      body.append("salePrice", String(payload.salePrice));
     if (payload.sale !== undefined) body.append("sale", String(payload.sale));
-    if (payload.quantity !== undefined) body.append("quantity", String(payload.quantity));
+    if (payload.quantity !== undefined)
+      body.append("quantity", String(payload.quantity));
     if (payload.des) body.append("des", payload.des);
     if (payload.not) body.append("not", payload.not);
 
@@ -439,7 +509,9 @@ export function AppProvider({ children }) {
   };
 
   const hasNestedFields = (payload) =>
-    NESTED_PRODUCT_KEYS.some((key) => payload[key] && Object.keys(payload[key]).length > 0);
+    NESTED_PRODUCT_KEYS.some(
+      (key) => payload[key] && Object.keys(payload[key]).length > 0,
+    );
 
   const pickNestedFields = (payload) => {
     const nested = {};
@@ -463,7 +535,10 @@ export function AppProvider({ children }) {
     const scalarBody = buildProductScalarsFormData();
 
     if (method === "POST") {
-      const result = await fetchInstance(endpoint, { method: "POST", body: scalarBody });
+      const result = await fetchInstance(endpoint, {
+        method: "POST",
+        body: scalarBody,
+      });
       const productId = result.product?._id;
 
       if (productId && hasNestedFields(payload)) {
@@ -493,11 +568,12 @@ export function AppProvider({ children }) {
   const buildProductFormData = () => buildProductScalarsFormData();
 
   useEffect(() => {
+    if (state.authLoading || !state.isAuthenticated) return;
     fetchUsers();
     fetchOrders();
     fetchProducts();
     fetchCategories();
-  }, []);
+  }, [state.authLoading, state.isAuthenticated]);
 
   return (
     <AppContext.Provider

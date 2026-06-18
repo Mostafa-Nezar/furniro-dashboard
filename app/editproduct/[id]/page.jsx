@@ -23,7 +23,12 @@ export default function EditProduct() {
   const [categoryLoading, setCategoryLoading] = useState(false);
   const [showCategoryInput, setShowCategoryInput] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
-  const [popup, setPopup] = useState({ open: false, title: "", message: "", type: "info" });
+  const [popup, setPopup] = useState({
+    open: false,
+    title: "",
+    message: "",
+    type: "info",
+  });
   const [product, setProduct] = useState(null);
 
   const objectToFields = (obj) => {
@@ -37,7 +42,11 @@ export default function EditProduct() {
   useEffect(() => {
     if (!products || !productId) return;
 
-    const prod = products.find((p) => p.id?.toString() === productId.toString() || p._id?.toString() === productId.toString());
+    const prod = products.find(
+      (p) =>
+        p.id?.toString() === productId.toString() ||
+        p._id?.toString() === productId.toString(),
+    );
     if (prod) {
       setProduct(prod);
       handleProductForm(ACTIONS.SET_ALL_PRODUCT_DATA, {
@@ -62,7 +71,7 @@ export default function EditProduct() {
         customAttributes: objectToFields(prod.customAttributes),
         colorsList: prod.colors && prod.colors.length > 0 ? prod.colors : [""],
         sizesList: prod.sizes && prod.sizes.length > 0 ? prod.sizes : [""],
-        images: []
+        images: [],
       });
     }
   }, [products, productId]);
@@ -88,9 +97,19 @@ export default function EditProduct() {
         method: "PUT",
       });
 
-      setPopup({ open: true, title: "Success", message: "Product updated successfully!", type: "success" });
+      setPopup({
+        open: true,
+        title: "Success",
+        message: "Product updated successfully!",
+        type: "success",
+      });
     } catch (err) {
-      setPopup({ open: true, title: "Error", message: err?.message || "Failed to update product.", type: "error" });
+      setPopup({
+        open: true,
+        title: "Error",
+        message: err?.message || "Failed to update product.",
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -117,9 +136,19 @@ export default function EditProduct() {
         });
         setNewCategoryName("");
         setShowCategoryInput(false);
-        setPopup({ open: true, title: "Success", message: "Category added successfully!", type: "success" });
+        setPopup({
+          open: true,
+          title: "Success",
+          message: "Category added successfully!",
+          type: "success",
+        });
       } else {
-        setPopup({ open: true, title: "Error", message: res.message || "Failed to add category", type: "error" });
+        setPopup({
+          open: true,
+          title: "Error",
+          message: res.message || "Failed to add category",
+          type: "error",
+        });
       }
     } finally {
       setCategoryLoading(false);
@@ -135,7 +164,9 @@ export default function EditProduct() {
   };
 
   if (!product) {
-    return <p className="text-center py-6 text-slate-400">Loading product...</p>;
+    return (
+      <p className="text-center py-6 text-slate-400">Loading product...</p>
+    );
   }
 
   const formData = productForm.formData;
@@ -149,17 +180,12 @@ export default function EditProduct() {
         type={popup.type}
         onClose={handleClosePopup}
       />
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-6xl mx-auto p-4 sm:p-6"
-      >
+      <form onSubmit={handleSubmit} className="max-w-6xl mx-auto p-4 sm:p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-heading">Edit Product</h2>
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={loading}
-          >
+          <h2 className="text-2xl sm:text-3xl font-bold text-heading">
+            Edit Product
+          </h2>
+          <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Saving..." : "Update Product"}
           </button>
         </div>
@@ -168,7 +194,9 @@ export default function EditProduct() {
           {/* Left Column: Basic Info & Media */}
           <div className="lg:col-span-7 flex flex-col gap-6">
             <div className="card p-5 space-y-4 rounded-3xl border border-slate-800 bg-slate-900/50">
-              <h3 className="text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">Basic Information</h3>
+              <h3 className="text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">
+                Basic Information
+              </h3>
 
               <input
                 type="text"
@@ -191,46 +219,52 @@ export default function EditProduct() {
                 />
                 <div className="space-y-2">
                   <div className="flex gap-2">
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 focus:border-violet-500 focus:ring-violet-500/30 outline-none transition"
-                  >
-                    <option value="">Select Category (Optional)</option>
-                    {(categories ?? []).map((c) => (
-                      <option key={c._id} value={c._id}>{c.name}</option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={handleAddCategory}
-                    disabled={categoryLoading}
-                    className="whitespace-nowrap rounded-2xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-700 transition disabled:opacity-50"
-                  >
-                    {categoryLoading ? "..." : showCategoryInput ? "Add" : "+ New"}
-                  </button>
-                </div>
-                {showCategoryInput && (
-                  <input
-                    type="text"
-                    value={newCategoryName}
-                    onChange={(e) => setNewCategoryName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleAddCategory();
-                      }
-                      if (e.key === "Escape") {
-                        setShowCategoryInput(false);
-                        setNewCategoryName("");
-                      }
-                    }}
-                    placeholder="New category name"
-                    autoFocus
-                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:ring-violet-500/30 outline-none transition"
-                  />
-                )}
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 focus:border-violet-500 focus:ring-violet-500/30 outline-none transition"
+                    >
+                      <option value="">Select Category (Optional)</option>
+                      {(categories ?? []).map((c) => (
+                        <option key={c._id} value={c._id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={handleAddCategory}
+                      disabled={categoryLoading}
+                      className="whitespace-nowrap rounded-2xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-700 transition disabled:opacity-50"
+                    >
+                      {categoryLoading
+                        ? "..."
+                        : showCategoryInput
+                          ? "Add"
+                          : "+ New"}
+                    </button>
+                  </div>
+                  {showCategoryInput && (
+                    <input
+                      type="text"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddCategory();
+                        }
+                        if (e.key === "Escape") {
+                          setShowCategoryInput(false);
+                          setNewCategoryName("");
+                        }
+                      }}
+                      placeholder="New category name"
+                      autoFocus
+                      className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:ring-violet-500/30 outline-none transition"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -293,7 +327,9 @@ export default function EditProduct() {
             </div>
 
             <div className="card p-5 space-y-4 rounded-3xl border border-slate-800 bg-slate-900/50">
-              <h3 className="text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">Media Files</h3>
+              <h3 className="text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">
+                Media Files
+              </h3>
               <div>
                 <div className="grid grid-cols-1 gap-2 text-body">
                   <input
@@ -305,7 +341,8 @@ export default function EditProduct() {
                   />
                 </div>
                 <div className="text-xs text-slate-500 mt-2">
-                  You can select multiple images at once. Selecting new images will overwrite the old ones if processed that way in backend.
+                  You can select multiple images at once. Selecting new images
+                  will overwrite the old ones if processed that way in backend.
                 </div>
               </div>
             </div>
@@ -314,7 +351,9 @@ export default function EditProduct() {
           {/* Right Column: Variations & Attributes */}
           <div className="lg:col-span-5 flex flex-col gap-6">
             <div className="card p-5 space-y-5 rounded-3xl border border-slate-800 bg-slate-900/50">
-              <h3 className="text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">Variations</h3>
+              <h3 className="text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">
+                Variations
+              </h3>
 
               {/* Colors */}
               <div>
@@ -322,7 +361,11 @@ export default function EditProduct() {
                   <h4 className="text-sm font-medium text-slate-300">Colors</h4>
                   <button
                     type="button"
-                    onClick={() => handleProductForm(ACTIONS.ADD_PRODUCT_STRING_ARRAY_ROW, { section: "colorsList" })}
+                    onClick={() =>
+                      handleProductForm(ACTIONS.ADD_PRODUCT_STRING_ARRAY_ROW, {
+                        section: "colorsList",
+                      })
+                    }
                     className="text-xs text-violet-400 hover:text-violet-300 bg-violet-500/10 px-2 py-1 rounded-lg"
                   >
                     + Add Color
@@ -335,12 +378,26 @@ export default function EditProduct() {
                         type="text"
                         placeholder="e.g. Red, #ff0000"
                         value={item}
-                        onChange={(e) => handleProductForm(ACTIONS.UPDATE_PRODUCT_STRING_ARRAY, { section: "colorsList", index: idx, value: e.target.value })}
+                        onChange={(e) =>
+                          handleProductForm(
+                            ACTIONS.UPDATE_PRODUCT_STRING_ARRAY,
+                            {
+                              section: "colorsList",
+                              index: idx,
+                              value: e.target.value,
+                            },
+                          )
+                        }
                         className="rounded-xl w-full border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:ring-violet-500/30 outline-none transition"
                       />
                       <button
                         type="button"
-                        onClick={() => handleProductForm(ACTIONS.REMOVE_PRODUCT_STRING_ARRAY_ROW, { section: "colorsList", index: idx })}
+                        onClick={() =>
+                          handleProductForm(
+                            ACTIONS.REMOVE_PRODUCT_STRING_ARRAY_ROW,
+                            { section: "colorsList", index: idx },
+                          )
+                        }
                         className="px-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
                       >
                         ×
@@ -356,7 +413,11 @@ export default function EditProduct() {
                   <h4 className="text-sm font-medium text-slate-300">Sizes</h4>
                   <button
                     type="button"
-                    onClick={() => handleProductForm(ACTIONS.ADD_PRODUCT_STRING_ARRAY_ROW, { section: "sizesList" })}
+                    onClick={() =>
+                      handleProductForm(ACTIONS.ADD_PRODUCT_STRING_ARRAY_ROW, {
+                        section: "sizesList",
+                      })
+                    }
                     className="text-xs text-violet-400 hover:text-violet-300 bg-violet-500/10 px-2 py-1 rounded-lg"
                   >
                     + Add Size
@@ -369,12 +430,26 @@ export default function EditProduct() {
                         type="text"
                         placeholder="e.g. XL, 42"
                         value={item}
-                        onChange={(e) => handleProductForm(ACTIONS.UPDATE_PRODUCT_STRING_ARRAY, { section: "sizesList", index: idx, value: e.target.value })}
+                        onChange={(e) =>
+                          handleProductForm(
+                            ACTIONS.UPDATE_PRODUCT_STRING_ARRAY,
+                            {
+                              section: "sizesList",
+                              index: idx,
+                              value: e.target.value,
+                            },
+                          )
+                        }
                         className="rounded-xl w-full border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:ring-violet-500/30 outline-none transition"
                       />
                       <button
                         type="button"
-                        onClick={() => handleProductForm(ACTIONS.REMOVE_PRODUCT_STRING_ARRAY_ROW, { section: "sizesList", index: idx })}
+                        onClick={() =>
+                          handleProductForm(
+                            ACTIONS.REMOVE_PRODUCT_STRING_ARRAY_ROW,
+                            { section: "sizesList", index: idx },
+                          )
+                        }
                         className="px-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
                       >
                         ×
@@ -386,7 +461,9 @@ export default function EditProduct() {
             </div>
 
             <div className="card p-5 space-y-6 rounded-3xl border border-slate-800 bg-slate-900/50">
-              <h3 className="text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">Technical Details</h3>
+              <h3 className="text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">
+                Technical Details
+              </h3>
 
               {[
                 { title: "General", fieldKey: "generalFields" },
@@ -395,12 +472,21 @@ export default function EditProduct() {
                 { title: "Warranty", fieldKey: "warrantyFields" },
                 { title: "Custom Attributes", fieldKey: "customAttributes" },
               ].map((section) => (
-                <div key={section.title} className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800/50">
+                <div
+                  key={section.title}
+                  className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800/50"
+                >
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-sm font-medium text-slate-300">{section.title}</h4>
+                    <h4 className="text-sm font-medium text-slate-300">
+                      {section.title}
+                    </h4>
                     <button
                       type="button"
-                      onClick={() => handleProductForm(ACTIONS.ADD_PRODUCT_FIELD_ROW, { section: section.fieldKey })}
+                      onClick={() =>
+                        handleProductForm(ACTIONS.ADD_PRODUCT_FIELD_ROW, {
+                          section: section.fieldKey,
+                        })
+                      }
                       className="text-xs text-violet-400 hover:text-violet-300 bg-violet-500/10 px-2 py-1 rounded-lg"
                     >
                       + Add Field
@@ -408,12 +494,22 @@ export default function EditProduct() {
                   </div>
                   <div className="space-y-2">
                     {productForm[section.fieldKey].map((item, idx) => (
-                      <div key={idx} className="flex flex-col sm:flex-row gap-2">
+                      <div
+                        key={idx}
+                        className="flex flex-col sm:flex-row gap-2"
+                      >
                         <input
                           type="text"
                           placeholder="Name"
                           value={item.key}
-                          onChange={(e) => handleProductForm(ACTIONS.UPDATE_PRODUCT_FIELD, { section: section.fieldKey, index: idx, field: "key", value: e.target.value })}
+                          onChange={(e) =>
+                            handleProductForm(ACTIONS.UPDATE_PRODUCT_FIELD, {
+                              section: section.fieldKey,
+                              index: idx,
+                              field: "key",
+                              value: e.target.value,
+                            })
+                          }
                           className="rounded-xl sm:w-1/3 border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:ring-violet-500/30 outline-none transition"
                         />
                         <div className="flex gap-2 sm:w-2/3">
@@ -421,12 +517,24 @@ export default function EditProduct() {
                             type="text"
                             placeholder="Value"
                             value={item.value}
-                            onChange={(e) => handleProductForm(ACTIONS.UPDATE_PRODUCT_FIELD, { section: section.fieldKey, index: idx, field: "value", value: e.target.value })}
+                            onChange={(e) =>
+                              handleProductForm(ACTIONS.UPDATE_PRODUCT_FIELD, {
+                                section: section.fieldKey,
+                                index: idx,
+                                field: "value",
+                                value: e.target.value,
+                              })
+                            }
                             className="rounded-xl w-full border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet-500 focus:ring-violet-500/30 outline-none transition"
                           />
                           <button
                             type="button"
-                            onClick={() => handleProductForm(ACTIONS.REMOVE_PRODUCT_FIELD_ROW, { section: section.fieldKey, index: idx })}
+                            onClick={() =>
+                              handleProductForm(
+                                ACTIONS.REMOVE_PRODUCT_FIELD_ROW,
+                                { section: section.fieldKey, index: idx },
+                              )
+                            }
                             className="px-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
                           >
                             ×

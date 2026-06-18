@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAppContext } from "../../context/context";
+import { fetchInstance } from "../../context/api";
 import { ArrowLeft, Truck, CheckCircle2, XCircle } from "lucide-react";
 
 export default function OrderDetails() {
@@ -13,13 +14,10 @@ export default function OrderDetails() {
   const updateStatus = async (newStatus) => {
     try {
       setUpdating(true);
-      const res = await fetch(`http://localhost:3001/api/orders/${id}/status`, {
+      const data = await fetchInstance(`/orders/${id}/status`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
-
-      const data = await res.json();
       if (data.success) {
         setOrder((prev) => ({ ...prev, status: data.order.status }));
       } else {

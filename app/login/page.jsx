@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "../context/context";
+import { fetchInstance } from "../context/api";
 
 export default function AdminLogin() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -23,25 +24,18 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const res = await fetch(
-        "http://localhost:3001/api/adminlogin",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(form),
-        }
-      );
+      const data = await fetchInstance("/adminlogin", {
+        method: "POST",
+        body: JSON.stringify(form),
+      });
 
-      const data = await res.json();
-
-      if (res.ok && data.token) {
+      if (data.admin) {
         const userData = {
-          email: form.email,
-          name: data.user?.name || form.email,
-          role: data.user?.role || "admin",
+          email: data.admin.email,
+          name: data.admin.name,
+          role: data.admin.role,
         };
-        login(userData, data.token);
+        login(userData);
         alert(data.msg || "login successfully");
         router.push("/");
       } else {
@@ -49,7 +43,7 @@ export default function AdminLogin() {
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("something went wronge");
+      alert(error.data?.msg || error.message || "something went wrong");
     } finally {
       setLoading(false);
     }
