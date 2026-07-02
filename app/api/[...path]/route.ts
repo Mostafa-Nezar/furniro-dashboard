@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BACKEND_URL =
   process.env.BACKEND_URL ||
-  "https://furniro-back-production.up.railway.app/api";
+  "https://furniro-back.vercel.app/api";
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
