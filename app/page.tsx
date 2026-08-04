@@ -14,6 +14,7 @@ import TreemapComponent from "./components/charts/TreemapComponent";
 import SankeyComponent from "./components/charts/SankeyComponent";
 import FunnelChartComponent from "./components/charts/FunnelChartComponent";
 import StackedAreaChartComponent from "./components/charts/StackedAreaChartComponent";
+import SvgIcon from "./components/SvgIcon";
 
 export default function DashboardPage() {
   const { orders, usersData, loading } = useAppContext();
@@ -199,49 +200,73 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* 1. Line Chart */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">📈 Line Chart - Monthly Trends</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="lineChart" className="inline-block mr-2 w-5 h-5" title="Line chart icon" />
+              Line Chart - Monthly Trends
+            </h3>
             <LineChartComponent data={processedData.monthlyData} title="" />
           </div>
 
           {/* 2. Bar Chart */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">📊 Bar Chart - Product Performance</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="barChart" className="inline-block mr-2 w-5 h-5" title="Bar chart icon" />
+              Bar Chart - Product Performance
+            </h3>
             <BarChartComponent data={processedData.productData} title="" />
           </div>
 
           {/* 3. Area Chart */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">📉 Area Chart - Growth Over Time</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="areaChart" className="inline-block mr-2 w-5 h-5" title="Area chart icon" />
+              Area Chart - Growth Over Time
+            </h3>
             <AreaChartComponent data={processedData.monthlyData} title="" />
           </div>
 
           {/* 4. Pie Chart */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">🥧 Pie Chart - Category Distribution</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="pieChart" className="inline-block mr-2 w-5 h-5" title="Pie chart icon" />
+              Pie Chart - Category Distribution
+            </h3>
             <PieChartComponent data={processedData.categoryData} title="" />
           </div>
 
           {/* 5. Radar Chart */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">🎯 Radar Chart - Performance Metrics</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="radar" className="inline-block mr-2 w-5 h-5" title="Radar chart icon" />
+              Radar Chart - Performance Metrics
+            </h3>
             <RadarChartComponent data={processedData.radarData} title="" />
           </div>
 
           {/* 6. Scatter Chart */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">💫 Scatter Chart - Data Correlation</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="scatter" className="inline-block mr-2 w-5 h-5" title="Scatter chart icon" />
+              Scatter Chart - Data Correlation
+            </h3>
             <ScatterChartComponent data={processedData.scatterData} title="" />
           </div>
 
           {/* 7. Composed Chart */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">🔄 Composed Chart - Mixed Data</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="composed" className="inline-block mr-2 w-5 h-5" title="Composed chart icon" />
+              Composed Chart - Mixed Data
+            </h3>
             <ComposedChartComponent data={processedData.monthlyData} title="" />
           </div>
 
           {/* 8. Radial Bar Chart */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">⭕ Radial Bar Chart - Age Distribution</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="radial" className="inline-block mr-2 w-5 h-5" title="Radial bar chart icon" />
+              Radial Bar Chart - Age Distribution
+            </h3>
             <RadialBarChartComponent data={processedData.radialData} title="" />
           </div>
         </div>
@@ -250,25 +275,37 @@ export default function DashboardPage() {
         <div className="space-y-8">
           {/* 9. Treemap */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">📦 Treemap - Hierarchical Data</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="treemap" className="inline-block mr-2 w-5 h-5" title="Treemap icon" />
+              Treemap - Hierarchical Data
+            </h3>
             <TreemapComponent data={processedData.treeData} title="" />
           </div>
 
           {/* 10. Sankey Diagram */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">🔀 Sankey Diagram - User Flow</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="sankey" className="inline-block mr-2 w-5 h-5" title="Sankey diagram icon" />
+              Sankey Diagram - User Flow
+            </h3>
             <SankeyComponent data={processedData.sankeyData} title="" />
           </div>
 
           {/* 11. Funnel Chart */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">📌 Funnel Chart - Conversion Pipeline</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="funnel" className="inline-block mr-2 w-5 h-5" title="Funnel chart icon" />
+              Funnel Chart - Conversion Pipeline
+            </h3>
             <FunnelChartComponent data={processedData.funnelData} title="" />
           </div>
 
           {/* 12. Stacked Area Chart */}
           <div className="card p-6">
-            <h3 className="text-xl font-bold text-heading mb-4">📈 Stacked Area Chart - Combined Metrics</h3>
+            <h3 className="text-xl font-bold text-heading mb-4">
+              <SvgIcon type="stackedArea" className="inline-block mr-2 w-5 h-5" title="Stacked area chart icon" />
+              Stacked Area Chart - Combined Metrics
+            </h3>
             <StackedAreaChartComponent data={processedData.monthlyData} title="" />
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import SvgIcon from '../../components/SvgIcon';
 
 const ChartsIndex = () => {
     const sections = [
@@ -9,19 +10,19 @@ const ChartsIndex = () => {
             title: 'Dashboard',
             description: 'View all 12 chart types with live interactive examples',
             link: '/charts',
-            icon: '📊'
+            iconType: 'dashboard'
         },
         {
             title: 'Documentation',
             description: 'Complete guide with descriptions, use cases, and features for each chart',
             link: '/charts/documentation',
-            icon: '📖'
+            iconType: 'documentation'
         },
         {
             title: 'Components',
             description: 'Reusable chart components for your project',
             link: '/components/charts',
-            icon: '⚙️'
+            iconType: 'components'
         }
     ];
 
@@ -45,7 +46,9 @@ const ChartsIndex = () => {
                             className="group"
                         >
                             <div className="bg-white rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 p-8 h-full hover:-translate-y-2">
-                                <div className="text-5xl mb-4">{section.icon}</div>
+                                <div className="text-5xl mb-4">
+                                    <SvgIcon type={section.iconType} className="w-12 h-12" title={`${section.title} icon`} />
+                                </div>
                                 <h2 className="text-2xl font-bold text-gray-800 mb-3">{section.title}</h2>
                                 <p className="text-gray-600 mb-4">{section.description}</p>
                                 <div className="text-blue-500 font-semibold group-hover:text-blue-700 transition-colors">

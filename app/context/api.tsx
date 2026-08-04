@@ -10,7 +10,7 @@ export const fetchInstance = async (endpoint: string, options: RequestInit = {})
         "Content-Type": "application/json",
       };
 
-  const token = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+  const token: string | null = localStorage.getItem("adminToken");
   const headers = new Headers({
     ...defaultHeaders,
     ...(options.headers || {}),
