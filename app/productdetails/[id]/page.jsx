@@ -1,11 +1,11 @@
 "use client";
-import { useAppContext } from "../../context/context";
+import { useProductContext } from "../../context/prosuctcontext";
 import { useRouter, useParams } from "next/navigation";
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 
 export default function ProductDetails() {
-  const { products } = useAppContext();
+  const { products } = useProductContext();
   const router = useRouter();
   const params = useParams();
   const productId = params.id;
@@ -66,8 +66,8 @@ export default function ProductDetails() {
                     src={img}
                     alt={`img-${i}`}
                     className={`w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg cursor-pointer border-2 sm:border-4 transition-all flex-shrink-0 ${selectedImage === img
-                        ? "border-indigo-500 scale-105"
-                        : "border-gray-600"
+                      ? "border-indigo-500 scale-105"
+                      : "border-gray-600"
                       } hover:border-indigo-400 hover:scale-105`}
                     onClick={() => setSelectedImage(img)}
                   />

@@ -1,5 +1,5 @@
 "use client";
-import { useAppContext } from "../context/context";
+import { useProductContext } from "../context/prosuctcontext";
 import { useRouter } from "next/navigation";
 import { Edit, Trash2 } from "lucide-react";
 
@@ -18,7 +18,7 @@ const StarIcon = ({ rating }) => (
 );
 
 export default function Products() {
-  const { products, deleteProduct } = useAppContext();
+  const { products, deleteProduct } = useProductContext();
   const router = useRouter();
 
   return (
