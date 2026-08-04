@@ -1,19 +1,28 @@
 "use client";
 import { createContext, useContext, useReducer, useEffect } from "react";
 import { fetchInstance } from "./api";
+import { useAuthContext } from "./authcontext";
 
-const AppContext = createContext();
+const ProductContext = createContext<{
+  products: any[];
+  categories: any[];
+  productCreateLoading: boolean;
+  productForm: any;
+  createProduct: (productData: FormData) => Promise<any>;
+  fetchProducts: () => Promise<void>;
+  fetchCategories: () => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
+  createCategory: (name: string) => Promise<{ success: boolean; category?: any; message?: string }>;
+  handleProductForm: (type: string, payload: any) => void;
+  buildProductFormData: () => FormData;
+  submitProduct: ({ endpoint, method }: { endpoint: string; method?: string }) => Promise<any>;
+  isValidObjectId: (value: string) => boolean;
+} | null>(null);
 
 const initialState = {
-  usersData: [],
-  orders: [],
   products: [],
   categories: [],
-  user: null,
-  isAuthenticated: false,
-  loading: false,
   productCreateLoading: false,
-  authLoading: true,
   productForm: {
     formData: {
       key: "",
@@ -38,21 +47,11 @@ const initialState = {
 };
 
 export const ACTIONS = {
-  SET_USERS: "SET_USERS",
   SET_PRODUCTS: "SET_PRODUCTS",
   ADD_PRODUCT: "ADD_PRODUCT",
-  SET_ORDERS: "SET_ORDERS",
   SET_CATEGORIES: "SET_CATEGORIES",
   ADD_CATEGORY: "ADD_CATEGORY",
-
-  SET_USER: "SET_USER",
-  SET_AUTH: "SET_AUTH",
-  LOGOUT: "LOGOUT",
-
-  SET_LOADING: "SET_LOADING",
   SET_PRODUCT_LOADING: "SET_PRODUCT_LOADING",
-  SET_AUTH_LOADING: "SET_AUTH_LOADING",
-
   SET_PRODUCT_FORM_DATA: "SET_PRODUCT_FORM_DATA",
   SET_ALL_PRODUCT_DATA: "SET_ALL_PRODUCT_DATA",
   SET_PRODUCT_IMAGES: "SET_PRODUCT_IMAGES",
@@ -65,54 +64,25 @@ export const ACTIONS = {
   RESET_PRODUCT_FORM: "RESET_PRODUCT_FORM",
 };
 
-function reducer(state, action) {
+function reducer(state: typeof initialState, action: { type: string; payload?: any }) {
   switch (action.type) {
-    case ACTIONS.SET_USERS:
-      return { ...state, usersData: action.payload };
-
     case ACTIONS.SET_PRODUCTS:
       return { ...state, products: action.payload };
 
     case ACTIONS.ADD_PRODUCT:
       return { ...state, products: [...state.products, action.payload] };
 
-    case ACTIONS.SET_ORDERS:
-      return { ...state, orders: action.payload };
-
     case ACTIONS.SET_CATEGORIES:
       return { ...state, categories: action.payload };
 
     case ACTIONS.ADD_CATEGORY: {
-      const exists = state.categories.some((c) => c._id === action.payload._id);
+      const exists = state.categories.some((c: any) => c._id === action.payload._id);
       if (exists) return state;
       return { ...state, categories: [...state.categories, action.payload] };
     }
 
-    case ACTIONS.SET_USER:
-      return { ...state, user: action.payload };
-
-    case ACTIONS.SET_AUTH:
-      return {
-        ...state,
-        user: action.payload.user,
-        isAuthenticated: true,
-      };
-
-    case ACTIONS.LOGOUT:
-      return {
-        ...state,
-        user: null,
-        isAuthenticated: false,
-      };
-
-    case ACTIONS.SET_LOADING:
-      return { ...state, loading: action.payload };
-
     case ACTIONS.SET_PRODUCT_LOADING:
       return { ...state, productCreateLoading: action.payload };
-
-    case ACTIONS.SET_AUTH_LOADING:
-      return { ...state, authLoading: action.payload };
 
     case ACTIONS.SET_PRODUCT_FORM_DATA:
       return {
@@ -134,7 +104,7 @@ function reducer(state, action) {
       };
     case ACTIONS.UPDATE_PRODUCT_FIELD: {
       const { section, index, field, value } = action.payload;
-      const newFields = [...state.productForm[section]];
+      const newFields = [...(state.productForm[section as keyof typeof state.productForm] as any[])];
       newFields[index] = { ...newFields[index], [field]: value };
       return {
         ...state,
@@ -147,7 +117,10 @@ function reducer(state, action) {
         ...state,
         productForm: {
           ...state.productForm,
-          [section]: [...state.productForm[section], { key: "", value: "" }],
+          [section]: [
+            ...(state.productForm[section as keyof typeof state.productForm] as any[]),
+            { key: "", value: "" },
+          ],
         },
       };
     }
@@ -157,13 +130,15 @@ function reducer(state, action) {
         ...state,
         productForm: {
           ...state.productForm,
-          [section]: state.productForm[section].filter((_, i) => i !== index),
+          [section]: (state.productForm[section as keyof typeof state.productForm] as any[]).filter(
+            (_: any, i: number) => i !== index,
+          ),
         },
       };
     }
     case ACTIONS.UPDATE_PRODUCT_STRING_ARRAY: {
       const { section, index, value } = action.payload;
-      const newList = [...state.productForm[section]];
+      const newList = [...(state.productForm[section as keyof typeof state.productForm] as any[])];
       newList[index] = value;
       return {
         ...state,
@@ -176,7 +151,10 @@ function reducer(state, action) {
         ...state,
         productForm: {
           ...state.productForm,
-          [section]: [...state.productForm[section], ""],
+          [section]: [
+            ...(state.productForm[section as keyof typeof state.productForm] as any[]),
+            "",
+          ],
         },
       };
     }
@@ -186,7 +164,9 @@ function reducer(state, action) {
         ...state,
         productForm: {
           ...state.productForm,
-          [section]: state.productForm[section].filter((_, i) => i !== index),
+          [section]: (state.productForm[section as keyof typeof state.productForm] as any[]).filter(
+            (_: any, i: number) => i !== index,
+          ),
         },
       };
     }
@@ -198,94 +178,44 @@ function reducer(state, action) {
   }
 }
 
-export function AppProvider({ children }) {
+export function ProductProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  const login = (userData) => {
-    localStorage.setItem("adminUser", JSON.stringify(userData));
-
-    dispatch({
-      type: ACTIONS.SET_AUTH,
-      payload: { user: userData },
-    });
-  };
-
-  const logout = async () => {
-    try {
-      await fetchInstance("/adminlogout", { method: "POST" });
-    } catch (err) {
-      console.error("logout error:", err.message);
-    }
-
-    localStorage.removeItem("adminUser");
-    dispatch({ type: ACTIONS.LOGOUT });
-  };
-
-  useEffect(() => {
-    const verifySession = async () => {
-      const savedUser = localStorage.getItem("adminUser");
-
-      if (!savedUser) {
-        dispatch({ type: ACTIONS.SET_AUTH_LOADING, payload: false });
-        return;
-      }
-
-      try {
-        await fetchInstance("/categories");
-        const user = JSON.parse(savedUser);
-        dispatch({
-          type: ACTIONS.SET_AUTH,
-          payload: { user },
-        });
-      } catch {
-        localStorage.removeItem("adminUser");
-        dispatch({ type: ACTIONS.LOGOUT });
-      } finally {
-        dispatch({ type: ACTIONS.SET_AUTH_LOADING, payload: false });
-      }
-    };
-
-    verifySession();
-  }, []);
-
-  const fetchUsers = async () => {
-    try {
-      dispatch({ type: ACTIONS.SET_LOADING, payload: true });
-
-      const data = await fetchInstance("/users");
-
-      dispatch({
-        type: ACTIONS.SET_USERS,
-        payload: data || [],
-      });
-    } catch (err) {
-      console.error("fetchUsers error:", err.message);
-    } finally {
-      dispatch({ type: ACTIONS.SET_LOADING, payload: false });
-    }
-  };
+  const { isAuthenticated, authLoading } = useAuthContext();
 
   const fetchCategories = async () => {
     try {
-      const res = await fetchInstance("/categories");
+      const res = await fetchInstance("/products/db/categories");
       const list = Array.isArray(res) ? res : res?.categories;
       if (Array.isArray(list)) {
         dispatch({ type: ACTIONS.SET_CATEGORIES, payload: list });
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to fetch categories:", err);
     }
   };
 
-  const createCategory = async (name) => {
+  const createCategory = async (name: string, imageFile?: File | null) => {
     try {
-      const res = await fetchInstance("/add-category", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name }),
-      });
+      let res;
+
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("image", imageFile);
+        res = await fetchInstance("/add-category", {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        res = await fetchInstance("/add-category", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name }),
+        });
+      }
+
       if (res.success && res.category) {
         dispatch({ type: ACTIONS.ADD_CATEGORY, payload: res.category });
         return { success: true, category: res.category };
@@ -294,63 +224,25 @@ export function AppProvider({ children }) {
         success: false,
         message: res.message || "Failed to create category",
       };
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("createCategory error:", err);
-      return { success: false, message: err.message };
+      return { success: false, message: err instanceof Error ? err.message : "Unknown error" };
     }
   };
 
   const fetchProducts = async () => {
     try {
-      dispatch({ type: ACTIONS.SET_LOADING, payload: true });
-
       const data = await fetchInstance("/products/db");
-
       dispatch({
         type: ACTIONS.SET_PRODUCTS,
         payload: data || [],
       });
-    } catch (err) {
-      console.error("fetchProducts error:", err.message);
-    } finally {
-      dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+    } catch (err: unknown) {
+      console.error("fetchProducts error:", err instanceof Error ? err.message : err);
     }
   };
 
-  const fetchOrders = async () => {
-    try {
-      dispatch({ type: ACTIONS.SET_LOADING, payload: true });
-
-      const data = await fetchInstance("/orders");
-
-      dispatch({
-        type: ACTIONS.SET_ORDERS,
-        payload: data || [],
-      });
-    } catch (err) {
-      console.error("fetchOrders error:", err.message);
-    } finally {
-      dispatch({ type: ACTIONS.SET_LOADING, payload: false });
-    }
-  };
-
-  const handleDeleteUser = async (id) => {
-    try {
-      await fetchInstance(`/users/${id}`, {
-        method: "DELETE",
-      });
-
-      dispatch({
-        type: ACTIONS.SET_USERS,
-        payload: state.usersData.filter((u) => u._id !== id),
-      });
-    } catch (err) {
-      console.error(err.message);
-      alert(err.message);
-    }
-  };
-
-  const deleteProduct = async (id) => {
+  const deleteProduct = async (id: string) => {
     try {
       await fetchInstance(`/products/${id}/delete`, {
         method: "DELETE",
@@ -358,36 +250,15 @@ export function AppProvider({ children }) {
 
       dispatch({
         type: ACTIONS.SET_PRODUCTS,
-        payload: state.products.filter((p) => p._id !== id),
+        payload: state.products.filter((p: any) => p._id !== id),
       });
-    } catch (err) {
-      console.error(err.message);
+    } catch (err: unknown) {
+      console.error(err instanceof Error ? err.message : err);
       alert("Error deleting product");
     }
   };
 
-  const register = async (userData) => {
-    try {
-      dispatch({ type: ACTIONS.SET_LOADING, payload: true });
-
-      const data = await fetchInstance("/adminregister", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-
-      return data;
-    } catch (err) {
-      console.error("register error:", err.message);
-      throw err;
-    } finally {
-      dispatch({ type: ACTIONS.SET_LOADING, payload: false });
-    }
-  };
-
-  const createProduct = async (productData) => {
+  const createProduct = async (productData: FormData) => {
     try {
       dispatch({ type: ACTIONS.SET_PRODUCT_LOADING, payload: true });
 
@@ -398,36 +269,20 @@ export function AppProvider({ children }) {
 
       dispatch({ type: ACTIONS.ADD_PRODUCT, payload: data });
       return data;
-    } catch (err) {
-      console.error("createProduct error:", err.message);
+    } catch (err: unknown) {
+      console.error("createProduct error:", err instanceof Error ? err.message : err);
       throw err;
     } finally {
       dispatch({ type: ACTIONS.SET_PRODUCT_LOADING, payload: false });
     }
   };
 
-  const deleteOrder = async (id) => {
-    try {
-      await fetchInstance(`/orders/${id}`, {
-        method: "DELETE",
-      });
-
-      dispatch({
-        type: ACTIONS.SET_ORDERS,
-        payload: state.orders.filter((o) => o._id !== id),
-      });
-    } catch (err) {
-      console.error(err.message);
-      alert("Error deleting order");
-    }
-  };
-
-  const handleProductForm = (type, payload) => {
+  const handleProductForm = (type: string, payload: any) => {
     dispatch({ type, payload });
   };
 
-  const buildObject = (fields) => {
-    return fields.reduce((obj, item) => {
+  const buildObject = (fields: Array<{ key: string; value: string }>) => {
+    return fields.reduce<Record<string, string>>((obj, item) => {
       const key = item.key && item.key.trim();
       if (key) obj[key] = item.value;
       return obj;
@@ -444,7 +299,7 @@ export function AppProvider({ children }) {
 
   const buildProductPayload = () => {
     const form = state.productForm;
-    const payload = { name: form.formData.name.trim() };
+    const payload: Record<string, any> = { name: form.formData.name.trim() };
 
     if (form.formData.key?.trim()) payload.key = form.formData.key.trim();
 
@@ -461,13 +316,13 @@ export function AppProvider({ children }) {
     if (form.formData.not?.trim()) payload.not = form.formData.not.trim();
 
     const colors = form.colorsList
-      .filter((color) => typeof color === "string" && color.trim() !== "")
-      .map((color) => color.trim());
+      .filter((color: string) => typeof color === "string" && color.trim() !== "")
+      .map((color: string) => color.trim());
     if (colors.length) payload.colors = colors;
 
     const sizes = form.sizesList
-      .filter((size) => typeof size === "string" && size.trim() !== "")
-      .map((size) => size.trim());
+      .filter((size: string) => typeof size === "string" && size.trim() !== "")
+      .map((size: string) => size.trim());
     if (sizes.length) payload.sizes = sizes;
 
     const general = buildObject(form.generalFields);
@@ -501,27 +356,27 @@ export function AppProvider({ children }) {
     if (payload.des) body.append("des", payload.des);
     if (payload.not) body.append("not", payload.not);
 
-    payload.colors?.forEach((color) => body.append("colors", color));
-    payload.sizes?.forEach((size) => body.append("sizes", size));
-    state.productForm.images.forEach((file) => body.append("images", file));
+    payload.colors?.forEach((color: string) => body.append("colors", color));
+    payload.sizes?.forEach((size: string) => body.append("sizes", size));
+    state.productForm.images.forEach((file: File) => body.append("images", file));
 
     return body;
   };
 
-  const hasNestedFields = (payload) =>
+  const hasNestedFields = (payload: Record<string, any>) =>
     NESTED_PRODUCT_KEYS.some(
       (key) => payload[key] && Object.keys(payload[key]).length > 0,
     );
 
-  const pickNestedFields = (payload) => {
-    const nested = {};
+  const pickNestedFields = (payload: Record<string, any>) => {
+    const nested: Record<string, any> = {};
     NESTED_PRODUCT_KEYS.forEach((key) => {
       if (payload[key]) nested[key] = payload[key];
     });
     return nested;
   };
 
-  const submitProduct = async ({ endpoint, method = "POST" }) => {
+  const submitProduct = async ({ endpoint, method = "POST" }: { endpoint: string; method?: string }) => {
     const payload = buildProductPayload();
     const hasImages = state.productForm.images.length > 0;
 
@@ -563,38 +418,25 @@ export function AppProvider({ children }) {
     return fetchInstance(endpoint, { method: "PUT", body: scalarBody });
   };
 
-  const isValidObjectId = (value) => /^[0-9a-fA-F]{24}$/.test(value);
+  const isValidObjectId = (value: string) => /^[0-9a-fA-F]{24}$/.test(value);
 
   const buildProductFormData = () => buildProductScalarsFormData();
 
   useEffect(() => {
-    if (state.authLoading || !state.isAuthenticated) return;
-    fetchUsers();
-    fetchOrders();
+    if (authLoading || !isAuthenticated) return;
     fetchProducts();
     fetchCategories();
-  }, [state.authLoading, state.isAuthenticated]);
+  }, [authLoading, isAuthenticated]);
 
   return (
-    <AppContext.Provider
+    <ProductContext.Provider
       value={{
         ...state,
-
-        login,
-        logout,
-        register,
         createProduct,
-
-        fetchUsers,
-        fetchOrders,
         fetchProducts,
         fetchCategories,
-
-        handleDeleteUser,
         deleteProduct,
-        deleteOrder,
         createCategory,
-
         handleProductForm,
         buildProductFormData,
         submitProduct,
@@ -602,13 +444,14 @@ export function AppProvider({ children }) {
       }}
     >
       {children}
-    </AppContext.Provider>
+    </ProductContext.Provider>
   );
 }
 
-/* =========================
-   HOOK
-========================= */
-export function useAppContext() {
-  return useContext(AppContext);
+export function useProductContext() {
+  const context = useContext(ProductContext);
+  if (!context) {
+    throw new Error("useProductContext must be used within a ProductProvider");
+  }
+  return context;
 }

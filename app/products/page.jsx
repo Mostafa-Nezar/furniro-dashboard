@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAppContext, ACTIONS } from "../context/context";
+import { useProductContext, ACTIONS } from "../context/prosuctcontext";
 
 export default function AddProductForm() {
   const {
@@ -11,7 +11,7 @@ export default function AddProductForm() {
     submitProduct,
     isValidObjectId,
     createCategory,
-  } = useAppContext();
+  } = useProductContext();
 
   const [loading, setLoading] = useState(false);
   const [categoryLoading, setCategoryLoading] = useState(false);

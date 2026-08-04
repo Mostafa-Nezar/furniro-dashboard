@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAppContext } from "../context/context";
+import { useAuthContext } from "../context/authcontext";
 
 export default function AdminRegister() {
-  const { register } = useAppContext();
+  const { register } = useAuthContext();
   const [form, setForm] = useState({
     name: "",
     email: "",

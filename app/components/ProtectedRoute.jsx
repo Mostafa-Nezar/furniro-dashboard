@@ -1,10 +1,10 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAppContext } from "../context/context";
+import { useAuthContext } from "../context/authcontext";
 
 export default function ProtectedRoute({ children }) {
-  const { isAuthenticated, authLoading } = useAppContext();
+  const { isAuthenticated, authLoading } = useAuthContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -15,8 +15,8 @@ export default function ProtectedRoute({ children }) {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-center py-6 text-muted">جاري التحقق من الهوية...</p>
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-14 w-14 animate-spin rounded-full border-4 border-gray-200 border-t-[#B88E2F]" />
       </div>
     );
   }

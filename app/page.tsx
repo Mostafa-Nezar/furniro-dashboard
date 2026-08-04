@@ -1,6 +1,7 @@
 "use client";
 import React, { useMemo } from "react";
 import { useAppContext } from "./context/context";
+import { useProductContext } from "./context/prosuctcontext";
 import LineChartComponent from "./components/charts/LineChartComponent";
 import BarChartComponent from "./components/charts/BarChartComponent";
 import AreaChartComponent from "./components/charts/AreaChartComponent";
@@ -15,7 +16,8 @@ import FunnelChartComponent from "./components/charts/FunnelChartComponent";
 import StackedAreaChartComponent from "./components/charts/StackedAreaChartComponent";
 
 export default function DashboardPage() {
-  const { orders, usersData, loading, products, categories } = useAppContext();
+  const { orders, usersData, loading } = useAppContext();
+  const { products, categories } = useProductContext();
 
   if (loading) {
     return <p className="text-center py-6 text-muted">Loading dashboard...</p>;
@@ -23,9 +25,7 @@ export default function DashboardPage() {
 
   const totalRevenue = orders.reduce((sum: number, order: { total?: number }) => sum + (order.total || 0), 0);
 
-  // Process data for charts
   const processedData = useMemo(() => {
-    // Monthly data - Group orders by month
     const monthlyMap = new Map();
     orders.forEach((order: any) => {
       const date = new Date(order.createdAt || order.date);

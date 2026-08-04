@@ -1,14 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAppContext } from "../context/context";
+import { useAuthContext } from "../context/authcontext";
 import { fetchInstance } from "../context/api";
 
 export default function AdminLogin() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { login, isAuthenticated, authLoading } = useAppContext();
+  const { login, isAuthenticated, authLoading } = useAuthContext();
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {

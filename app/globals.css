@@ -30,6 +30,10 @@
     --color-text: #f3f4f6;
 }
 
+body{
+    background-color: var(--color-bg);
+}
+
 /* Base theming helpers */
 .bg-app {
     background-color: var(--color-bg);

@@ -1,5 +1,7 @@
 import "./globals.css";
 import { AppProvider } from "./context/context";
+import { AuthProvider } from "./context/authcontext";
+import { ProductProvider } from "./context/prosuctcontext";
 import LayoutWrapper from "./components/LayoutWrapper";
 
 export const metadata = {
@@ -14,9 +16,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AppProvider>
-          <LayoutWrapper>{children}</LayoutWrapper>
-        </AppProvider>
+        <AuthProvider>
+          <AppProvider>
+            <ProductProvider>
+              <LayoutWrapper>{children}</LayoutWrapper>
+            </ProductProvider>
+          </AppProvider>
+        </AuthProvider>
       </body>
     </html>
   );
