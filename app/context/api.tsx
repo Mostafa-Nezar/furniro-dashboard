@@ -1,4 +1,6 @@
-const API_BASE_URL = "/api";
+const BACKEND_URL = "https://furniro-back.vercel.app/api";
+
+const buildUrl = (endpoint: string) => `${BACKEND_URL}${endpoint}`;
 
 export const fetchInstance = async (endpoint: string, options: RequestInit = {}) => {
   const isFormData = options.body instanceof FormData;
@@ -8,16 +10,22 @@ export const fetchInstance = async (endpoint: string, options: RequestInit = {})
         "Content-Type": "application/json",
       };
 
+  const token = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+  const headers = new Headers({
+    ...defaultHeaders,
+    ...(options.headers || {}),
+  } as HeadersInit);
+
+  if (token) {
+    headers.set("x-auth-token", token);
+  }
+
   const finalOptions: RequestInit = {
     ...options,
-    credentials: "include",
-    headers: {
-      ...defaultHeaders,
-      ...(options.headers || {}),
-    } as HeadersInit,
+    headers,
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, finalOptions);
+  const response = await fetch(buildUrl(endpoint), finalOptions);
   const data = await response.json();
 
   if (!response.ok) {

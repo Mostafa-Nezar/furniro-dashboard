@@ -6,7 +6,7 @@ const AuthContext = createContext<{
   user: any;
   isAuthenticated: boolean;
   authLoading: boolean;
-  login: (userData: any) => void;
+  login: (userData: any, token: string | null) => void;
   logout: () => Promise<void>;
   register: (userData: any) => Promise<any>;
 } | null>(null);
@@ -16,7 +16,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
 
-  const login = (userData: any) => {
+  const login = (userData: any, token: string | null) => {
+    if (token) {
+      localStorage.setItem("adminToken", token);
+    } else {
+      localStorage.removeItem("adminToken");
+    }
+
     localStorage.setItem("adminUser", JSON.stringify(userData));
     setUser(userData);
     setIsAuthenticated(true);
@@ -29,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("logout error:", err instanceof Error ? err.message : err);
     }
     localStorage.removeItem("adminUser");
+    localStorage.removeItem("adminToken");
     setUser(null);
     setIsAuthenticated(false);
   };
@@ -52,8 +59,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const verifySession = async () => {
       const savedUser = localStorage.getItem("adminUser");
+      const savedToken = localStorage.getItem("adminToken");
 
-      if (!savedUser) {
+      if (!savedUser || !savedToken) {
         setAuthLoading(false);
         return;
       }
@@ -65,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsAuthenticated(true);
       } catch {
         localStorage.removeItem("adminUser");
+        localStorage.removeItem("adminToken");
         setUser(null);
         setIsAuthenticated(false);
       } finally {

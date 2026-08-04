@@ -35,7 +35,7 @@ export default function AdminLogin() {
           name: data.admin.name,
           role: data.admin.role,
         };
-        login(userData);
+        login(userData, data.token || null);
         alert(data.msg || "login successfully");
         router.push("/");
       } else {
