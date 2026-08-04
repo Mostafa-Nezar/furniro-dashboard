@@ -197,7 +197,7 @@ export default function LayoutWrapper({ children }) {
         <div className="flex w-full flex-1 flex-col lg:w-auto">
           {/* Navbar */}
           <header
-            className="p-3 lg:p-4 border-b bg-surface flex items-center gap-3"
+            className="p-3 lg:p-4 border-b bg-app flex items-center gap-3"
             style={{ borderColor: "var(--color-border)" }}
           >
             <button

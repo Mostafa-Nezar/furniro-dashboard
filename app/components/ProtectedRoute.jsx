@@ -15,8 +15,8 @@ export default function ProtectedRoute({ children }) {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-14 w-14 animate-spin rounded-full border-4 border-gray-200 border-t-[#B88E2F]" />
+      <div className="flex min-h-screen items-center justify-center bg-app text-body">
+        <div className="h-14 w-14 animate-spin rounded-full border-4 border-gray-200 border-t-[#7c3aed]" />
       </div>
     );
   }
