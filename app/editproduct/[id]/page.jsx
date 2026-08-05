@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useAppContext, ACTIONS } from "../../context/context";
+import { useProductContext, ACTIONS } from "../../context/prosuctcontext";
 import Popup from "../../components/Popup";
 
 export default function EditProduct() {
@@ -17,7 +17,7 @@ export default function EditProduct() {
     handleProductForm,
     submitProduct,
     createCategory,
-  } = useAppContext();
+  } = useProductContext();
 
   const [loading, setLoading] = useState(false);
   const [categoryLoading, setCategoryLoading] = useState(false);
