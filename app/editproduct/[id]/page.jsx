@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useProductContext, ACTIONS } from "../../context/prosuctcontext";
 import Popup from "../../components/Popup";
+import ImageEditorPanel from "../../components/ImageEditorPanel";
 
 export default function EditProduct() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function EditProduct() {
   const [categoryLoading, setCategoryLoading] = useState(false);
   const [showCategoryInput, setShowCategoryInput] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [selectedImages, setSelectedImages] = useState([]);
   const [popup, setPopup] = useState({
     open: false,
     title: "",
@@ -81,8 +83,8 @@ export default function EditProduct() {
     handleProductForm(ACTIONS.SET_PRODUCT_FORM_DATA, { name, value });
   };
 
-  const handleImageChange = (e) => {
-    handleProductForm(ACTIONS.SET_PRODUCT_IMAGES, Array.from(e.target.files));
+  const handleImageChange = (files) => {
+    setSelectedImages(Array.isArray(files) ? files : []);
   };
 
   const handleSubmit = async (e) => {
@@ -95,6 +97,7 @@ export default function EditProduct() {
       await submitProduct({
         endpoint: `/update-product/${updateId}`,
         method: "PUT",
+        imagesOverride: selectedImages,
       });
 
       setPopup({
@@ -331,15 +334,7 @@ export default function EditProduct() {
                 Media Files
               </h3>
               <div>
-                <div className="grid grid-cols-1 gap-2 text-body">
-                  <input
-                    type="file"
-                    name="images"
-                    multiple
-                    onChange={handleImageChange}
-                    className="w-full text-sm text-slate-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-500/10 file:text-violet-400 hover:file:bg-violet-500/20 cursor-pointer"
-                  />
-                </div>
+                <ImageEditorPanel onChange={handleImageChange} label="Select image(s) and edit dimensions / crop / rotation" />
                 <div className="text-xs text-slate-500 mt-2">
                   You can select multiple images at once. Selecting new images
                   will overwrite the old ones if processed that way in backend.

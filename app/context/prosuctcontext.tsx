@@ -15,7 +15,7 @@ const ProductContext = createContext<{
   createCategory: (name: string) => Promise<{ success: boolean; category?: any; message?: string }>;
   handleProductForm: (type: string, payload: any) => void;
   buildProductFormData: () => FormData;
-  submitProduct: ({ endpoint, method }: { endpoint: string; method?: string }) => Promise<any>;
+  submitProduct: ({ endpoint, method, imagesOverride }: { endpoint: string; method?: string; imagesOverride?: File[] }) => Promise<any>;
   isValidObjectId: (value: string) => boolean;
 } | null>(null);
 
@@ -339,7 +339,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     return payload;
   };
 
-  const buildProductScalarsFormData = () => {
+  const buildProductScalarsFormData = (imagesOverride?: File[]) => {
     const payload = buildProductPayload();
     const body = new FormData();
 
@@ -358,7 +358,8 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
     payload.colors?.forEach((color: string) => body.append("colors", color));
     payload.sizes?.forEach((size: string) => body.append("sizes", size));
-    state.productForm.images.forEach((file: File) => body.append("images", file));
+    const imagesToAttach = imagesOverride ?? state.productForm.images;
+    imagesToAttach.forEach((file: File) => body.append("images", file));
 
     return body;
   };
@@ -376,9 +377,10 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     return nested;
   };
 
-  const submitProduct = async ({ endpoint, method = "POST" }: { endpoint: string; method?: string }) => {
+  const submitProduct = async ({ endpoint, method = "POST", imagesOverride }: { endpoint: string; method?: string; imagesOverride?: File[] }) => {
     const payload = buildProductPayload();
-    const hasImages = state.productForm.images.length > 0;
+    const imagesToUse = imagesOverride ?? state.productForm.images;
+    const hasImages = imagesToUse.length > 0;
 
     if (!hasImages) {
       return fetchInstance(endpoint, {
@@ -387,7 +389,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       });
     }
 
-    const scalarBody = buildProductScalarsFormData();
+    const scalarBody = buildProductScalarsFormData(imagesToUse);
 
     if (method === "POST") {
       const result = await fetchInstance(endpoint, {

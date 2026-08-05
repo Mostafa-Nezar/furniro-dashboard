@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useProductContext, ACTIONS } from "../context/prosuctcontext";
+import ImageEditorPanel from "../components/ImageEditorPanel";
 
 export default function AddProductForm() {
   const {
@@ -17,6 +18,7 @@ export default function AddProductForm() {
   const [categoryLoading, setCategoryLoading] = useState(false);
   const [showCategoryInput, setShowCategoryInput] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [selectedImages, setSelectedImages] = useState([]);
 
   useEffect(() => {
     handleProductForm(ACTIONS.RESET_PRODUCT_FORM);
@@ -27,8 +29,8 @@ export default function AddProductForm() {
     handleProductForm(ACTIONS.SET_PRODUCT_FORM_DATA, { name, value });
   };
 
-  const handleImageChange = (e) => {
-    handleProductForm(ACTIONS.SET_PRODUCT_IMAGES, Array.from(e.target.files));
+  const handleImageChange = (files) => {
+    setSelectedImages(Array.isArray(files) ? files : []);
   };
 
   const handleSubmit = async (e) => {
@@ -39,18 +41,20 @@ export default function AddProductForm() {
       const categoryValue = productForm.formData.category?.trim();
       if (categoryValue && !isValidObjectId(categoryValue) && categoryValue.length === 24) {
         if (!/^[0-9a-fA-F]{24}$/.test(categoryValue)) {
-           alert("Category must be a valid ID.");
-           setLoading(false);
-           return;
+          alert("Category must be a valid ID.");
+          setLoading(false);
+          return;
         }
       }
 
       const result = await submitProduct({
         endpoint: "/add-product",
         method: "POST",
+        imagesOverride: selectedImages,
       });
 
       alert(result.msg || "Product added successfully!");
+      setSelectedImages([]);
       handleProductForm(ACTIONS.RESET_PRODUCT_FORM);
     } catch (err) {
       console.error(err);
@@ -239,15 +243,7 @@ export default function AddProductForm() {
           <div className="card p-5 space-y-4 rounded-3xl border border-slate-800 bg-slate-900/50">
             <h3 className="text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">Media Files</h3>
             <div>
-              <div className="grid grid-cols-1 gap-2 text-body">
-                <input
-                  type="file"
-                  name="images"
-                  multiple
-                  onChange={handleImageChange}
-                  className="w-full text-sm text-slate-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-500/10 file:text-violet-400 hover:file:bg-violet-500/20 cursor-pointer"
-                />
-              </div>
+              <ImageEditorPanel onChange={handleImageChange} label="Select image(s) and edit dimensions / crop / rotation" />
               <div className="text-xs text-slate-500 mt-2">
                 You can select multiple images at once. First image will be used as thumbnail.
               </div>
