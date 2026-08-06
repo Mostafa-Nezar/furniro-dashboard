@@ -1,54 +1,29 @@
 "use client";
-import { createContext, useContext, useReducer, useEffect } from "react";
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
 import { fetchInstance } from "./api";
 import { useAuthContext } from "./authcontext";
-
-const ProductContext = createContext<{
-  products: any[];
-  categories: any[];
-  productCreateLoading: boolean;
-  productForm: any;
-  createProduct: (productData: FormData) => Promise<any>;
-  fetchProducts: () => Promise<void>;
-  fetchCategories: () => Promise<void>;
-  deleteProduct: (id: string) => Promise<void>;
-  createCategory: (name: string) => Promise<{ success: boolean; category?: any; message?: string }>;
-  handleProductForm: (type: string, payload: any) => void;
-  buildProductFormData: () => FormData;
-  submitProduct: ({ endpoint, method, imagesOverride }: { endpoint: string; method?: string; imagesOverride?: File[] }) => Promise<any>;
-  isValidObjectId: (value: string) => boolean;
-} | null>(null);
-
-const initialState = {
-  products: [],
-  categories: [],
-  productCreateLoading: false,
-  productForm: {
-    formData: {
-      key: "",
-      name: "",
-      price: "",
-      salePrice: "",
-      category: "",
-      des: "",
-      not: "",
-      sale: "",
-      quantity: "",
-    },
-    colorsList: [""],
-    sizesList: [""],
-    generalFields: [{ key: "", value: "" }],
-    myproductFields: [{ key: "", value: "" }],
-    dimensionsFields: [{ key: "", value: "" }],
-    warrantyFields: [{ key: "", value: "" }],
-    customAttributes: [{ key: "", value: "" }],
-    images: [],
-  },
-};
+import {
+  buildProductPayload,
+  buildScalarsFormData,
+  findProductById,
+  hasNestedFields,
+  initialProductForm, initialProductFormUi, pickNestedFields,
+  productToFormState,
+  type ProductFormState,
+  type ProductFormUiState,
+} from "./productFormHelpers";
 
 export const ACTIONS = {
   SET_PRODUCTS: "SET_PRODUCTS",
   ADD_PRODUCT: "ADD_PRODUCT",
+  UPDATE_PRODUCT: "UPDATE_PRODUCT",
   SET_CATEGORIES: "SET_CATEGORIES",
   ADD_CATEGORY: "ADD_CATEGORY",
   SET_PRODUCT_LOADING: "SET_PRODUCT_LOADING",
@@ -62,125 +37,240 @@ export const ACTIONS = {
   ADD_PRODUCT_STRING_ARRAY_ROW: "ADD_PRODUCT_STRING_ARRAY_ROW",
   REMOVE_PRODUCT_STRING_ARRAY_ROW: "REMOVE_PRODUCT_STRING_ARRAY_ROW",
   RESET_PRODUCT_FORM: "RESET_PRODUCT_FORM",
+  SET_PRODUCT_FORM_UI: "SET_PRODUCT_FORM_UI",
+  PATCH_PRODUCT_FORM_UI: "PATCH_PRODUCT_FORM_UI",
+  RESET_PRODUCT_FORM_UI: "RESET_PRODUCT_FORM_UI",
+} as const;
+
+type AppState = {
+  products: Record<string, unknown>[];
+  categories: Record<string, unknown>[];
+  productCreateLoading: boolean;
+  productForm: ProductFormState;
+  productFormUi: ProductFormUiState;
 };
 
-function reducer(state: typeof initialState, action: { type: string; payload?: any }) {
+const initialState: AppState = {
+  products: [],
+  categories: [],
+  productCreateLoading: false,
+  productForm: initialProductForm,
+  productFormUi: initialProductFormUi,
+};
+
+function reducer(
+  state: AppState,
+  action: { type: string; payload?: unknown },
+): AppState {
   switch (action.type) {
     case ACTIONS.SET_PRODUCTS:
-      return { ...state, products: action.payload };
+      return { ...state, products: action.payload as Record<string, unknown>[] };
 
     case ACTIONS.ADD_PRODUCT:
-      return { ...state, products: [...state.products, action.payload] };
+      return {
+        ...state,
+        products: [...state.products, action.payload as Record<string, unknown>],
+      };
+
+    case ACTIONS.UPDATE_PRODUCT:
+      return {
+        ...state,
+        products: state.products.map((product) =>
+          product._id === (action.payload as Record<string, unknown>)._id
+            ? (action.payload as Record<string, unknown>)
+            : product,
+        ),
+      };
 
     case ACTIONS.SET_CATEGORIES:
-      return { ...state, categories: action.payload };
+      return { ...state, categories: action.payload as Record<string, unknown>[] };
 
     case ACTIONS.ADD_CATEGORY: {
-      const exists = state.categories.some((c: any) => c._id === action.payload._id);
+      const category = action.payload as Record<string, unknown>;
+      const exists = state.categories.some((c) => c._id === category._id);
       if (exists) return state;
-      return { ...state, categories: [...state.categories, action.payload] };
+      return { ...state, categories: [...state.categories, category] };
     }
 
     case ACTIONS.SET_PRODUCT_LOADING:
-      return { ...state, productCreateLoading: action.payload };
+      return { ...state, productCreateLoading: action.payload as boolean };
 
-    case ACTIONS.SET_PRODUCT_FORM_DATA:
+    case ACTIONS.SET_PRODUCT_FORM_DATA: {
+      const { name, value } = action.payload as { name: string; value: string };
       return {
         ...state,
         productForm: {
           ...state.productForm,
-          formData: {
-            ...state.productForm.formData,
-            [action.payload.name]: action.payload.value,
-          },
+          formData: { ...state.productForm.formData, [name]: value },
         },
       };
+    }
+
     case ACTIONS.SET_ALL_PRODUCT_DATA:
-      return { ...state, productForm: action.payload };
+      return { ...state, productForm: action.payload as ProductFormState };
+
     case ACTIONS.SET_PRODUCT_IMAGES:
       return {
         ...state,
-        productForm: { ...state.productForm, images: action.payload },
+        productForm: {
+          ...state.productForm,
+          images: action.payload as File[],
+        },
       };
+
     case ACTIONS.UPDATE_PRODUCT_FIELD: {
-      const { section, index, field, value } = action.payload;
-      const newFields = [...(state.productForm[section as keyof typeof state.productForm] as any[])];
-      newFields[index] = { ...newFields[index], [field]: value };
+      const { section, index, field, value } = action.payload as {
+        section: keyof ProductFormState;
+        index: number;
+        field: "key" | "value";
+        value: string;
+      };
+      const rows = [...(state.productForm[section] as { key: string; value: string }[])];
+      rows[index] = { ...rows[index], [field]: value };
       return {
         ...state,
-        productForm: { ...state.productForm, [section]: newFields },
+        productForm: { ...state.productForm, [section]: rows },
       };
     }
+
     case ACTIONS.ADD_PRODUCT_FIELD_ROW: {
-      const { section } = action.payload;
+      const { section } = action.payload as { section: keyof ProductFormState };
       return {
         ...state,
         productForm: {
           ...state.productForm,
           [section]: [
-            ...(state.productForm[section as keyof typeof state.productForm] as any[]),
+            ...(state.productForm[section] as { key: string; value: string }[]),
             { key: "", value: "" },
           ],
         },
       };
     }
+
     case ACTIONS.REMOVE_PRODUCT_FIELD_ROW: {
-      const { section, index } = action.payload;
+      const { section, index } = action.payload as {
+        section: keyof ProductFormState;
+        index: number;
+      };
       return {
         ...state,
         productForm: {
           ...state.productForm,
-          [section]: (state.productForm[section as keyof typeof state.productForm] as any[]).filter(
-            (_: any, i: number) => i !== index,
-          ),
+          [section]: (
+            state.productForm[section] as { key: string; value: string }[]
+          ).filter((_, i) => i !== index),
         },
       };
     }
+
     case ACTIONS.UPDATE_PRODUCT_STRING_ARRAY: {
-      const { section, index, value } = action.payload;
-      const newList = [...(state.productForm[section as keyof typeof state.productForm] as any[])];
-      newList[index] = value;
+      const { section, index, value } = action.payload as {
+        section: "colorsList" | "sizesList";
+        index: number;
+        value: string;
+      };
+      const list = [...state.productForm[section]];
+      list[index] = value;
       return {
         ...state,
-        productForm: { ...state.productForm, [section]: newList },
+        productForm: { ...state.productForm, [section]: list },
       };
     }
+
     case ACTIONS.ADD_PRODUCT_STRING_ARRAY_ROW: {
-      const { section } = action.payload;
+      const { section } = action.payload as { section: "colorsList" | "sizesList" };
       return {
         ...state,
         productForm: {
           ...state.productForm,
-          [section]: [
-            ...(state.productForm[section as keyof typeof state.productForm] as any[]),
-            "",
-          ],
+          [section]: [...state.productForm[section], ""],
         },
       };
     }
+
     case ACTIONS.REMOVE_PRODUCT_STRING_ARRAY_ROW: {
-      const { section, index } = action.payload;
+      const { section, index } = action.payload as {
+        section: "colorsList" | "sizesList";
+        index: number;
+      };
       return {
         ...state,
         productForm: {
           ...state.productForm,
-          [section]: (state.productForm[section as keyof typeof state.productForm] as any[]).filter(
-            (_: any, i: number) => i !== index,
-          ),
+          [section]: state.productForm[section].filter((_, i) => i !== index),
         },
       };
     }
+
     case ACTIONS.RESET_PRODUCT_FORM:
-      return { ...state, productForm: initialState.productForm };
+      return { ...state, productForm: initialProductForm };
+
+    case ACTIONS.SET_PRODUCT_FORM_UI:
+      return { ...state, productFormUi: action.payload as ProductFormUiState };
+
+    case ACTIONS.PATCH_PRODUCT_FORM_UI:
+      return {
+        ...state,
+        productFormUi: {
+          ...state.productFormUi,
+          ...(action.payload as Partial<ProductFormUiState>),
+        },
+      };
+
+    case ACTIONS.RESET_PRODUCT_FORM_UI:
+      return { ...state, productFormUi: initialProductFormUi };
 
     default:
       return state;
   }
 }
 
+type ProductContextValue = {
+  products: Record<string, unknown>[];
+  categories: Record<string, unknown>[];
+  productCreateLoading: boolean;
+  productForm: ProductFormState;
+  productFormUi: ProductFormUiState;
+  fetchProducts: () => Promise<void>;
+  fetchCategories: () => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
+  createCategory: (
+    name: string,
+    imageFile?: File | null,
+  ) => Promise<{ success: boolean; category?: Record<string, unknown>; message?: string }>;
+  handleProductForm: (type: string, payload?: unknown) => void;
+  initAddProductPage: () => void;
+  initEditProductPage: (productId: string) => void;
+  setFormField: (name: string, value: string) => void;
+  setSelectedImages: (files: File[]) => void;
+  setNewCategoryName: (name: string) => void;
+  toggleCategoryInput: () => void;
+  cancelCategoryInput: () => void;
+  handleAddCategory: () => Promise<void>;
+  submitAddProduct: () => Promise<void>;
+  submitUpdateProduct: () => Promise<void>;
+  closeProductPopup: (redirectTo?: string | null) => void;
+  dismissProductPopup: () => void;
+};
+
+const ProductContext = createContext<ProductContextValue | null>(null);
+
 export function ProductProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { isAuthenticated, authLoading } = useAuthContext();
+
+  const patchUi = useCallback((patch: Partial<ProductFormUiState>) => {
+    dispatch({ type: ACTIONS.PATCH_PRODUCT_FORM_UI, payload: patch });
+  }, []);
+
+  const showPopup = useCallback(
+    (title: string, message: string, type: ProductFormUiState["popup"]["type"]) => {
+      patchUi({
+        popup: { open: true, title, message, type },
+      });
+    },
+    [patchUi],
+  );
 
   const fetchCategories = async () => {
     try {
@@ -194,42 +284,6 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const createCategory = async (name: string, imageFile?: File | null) => {
-    try {
-      let res;
-
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append("name", name);
-        formData.append("image", imageFile);
-        res = await fetchInstance("/add-category", {
-          method: "POST",
-          body: formData,
-        });
-      } else {
-        res = await fetchInstance("/add-category", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name }),
-        });
-      }
-
-      if (res.success && res.category) {
-        dispatch({ type: ACTIONS.ADD_CATEGORY, payload: res.category });
-        return { success: true, category: res.category };
-      }
-      return {
-        success: false,
-        message: res.message || "Failed to create category",
-      };
-    } catch (err: unknown) {
-      console.error("createCategory error:", err);
-      return { success: false, message: err instanceof Error ? err.message : "Unknown error" };
-    }
-  };
-
   const fetchProducts = async () => {
     try {
       const data = await fetchInstance("/products/db");
@@ -238,19 +292,55 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
         payload: data || [],
       });
     } catch (err: unknown) {
-      console.error("fetchProducts error:", err instanceof Error ? err.message : err);
+      console.error(
+        "fetchProducts error:",
+        err instanceof Error ? err.message : err,
+      );
+    }
+  };
+
+  const createCategory = async (name: string, imageFile?: File | null) => {
+    try {
+      const res = imageFile
+        ? await fetchInstance("/add-category", {
+            method: "POST",
+            body: (() => {
+              const formData = new FormData();
+              formData.append("name", name);
+              formData.append("image", imageFile);
+              return formData;
+            })(),
+          })
+        : await fetchInstance("/add-category", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name }),
+          });
+
+      if (res.success && res.category) {
+        dispatch({ type: ACTIONS.ADD_CATEGORY, payload: res.category });
+        return { success: true, category: res.category };
+      }
+
+      return {
+        success: false,
+        message: res.message || "Failed to create category",
+      };
+    } catch (err: unknown) {
+      console.error("createCategory error:", err);
+      return {
+        success: false,
+        message: err instanceof Error ? err.message : "Unknown error",
+      };
     }
   };
 
   const deleteProduct = async (id: string) => {
     try {
-      await fetchInstance(`/products/${id}/delete`, {
-        method: "DELETE",
-      });
-
+      await fetchInstance(`/products/${id}/delete`, { method: "DELETE" });
       dispatch({
         type: ACTIONS.SET_PRODUCTS,
-        payload: state.products.filter((p: any) => p._id !== id),
+        payload: state.products.filter((p) => p._id !== id),
       });
     } catch (err: unknown) {
       console.error(err instanceof Error ? err.message : err);
@@ -258,146 +348,30 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const createProduct = async (productData: FormData) => {
+  const createProductWithPayload = async (
+    payload: Record<string, unknown>,
+    images: File[],
+  ) => {
+    dispatch({ type: ACTIONS.SET_PRODUCT_LOADING, payload: true });
+
     try {
-      dispatch({ type: ACTIONS.SET_PRODUCT_LOADING, payload: true });
+      const hasImages = images.length > 0;
 
-      const data = await fetchInstance("/products", {
+      if (!hasImages) {
+        const data = await fetchInstance("/add-product", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        if (data?.product) dispatch({ type: ACTIONS.ADD_PRODUCT, payload: data.product });
+        return data;
+      }
+
+      const result = await fetchInstance("/add-product", {
         method: "POST",
-        body: productData,
+        body: buildScalarsFormData(payload, images),
       });
 
-      dispatch({ type: ACTIONS.ADD_PRODUCT, payload: data });
-      return data;
-    } catch (err: unknown) {
-      console.error("createProduct error:", err instanceof Error ? err.message : err);
-      throw err;
-    } finally {
-      dispatch({ type: ACTIONS.SET_PRODUCT_LOADING, payload: false });
-    }
-  };
-
-  const handleProductForm = (type: string, payload: any) => {
-    dispatch({ type, payload });
-  };
-
-  const buildObject = (fields: Array<{ key: string; value: string }>) => {
-    return fields.reduce<Record<string, string>>((obj, item) => {
-      const key = item.key && item.key.trim();
-      if (key) obj[key] = item.value;
-      return obj;
-    }, {});
-  };
-
-  const NESTED_PRODUCT_KEYS = [
-    "general",
-    "myproduct",
-    "dimensions",
-    "warranty",
-    "customAttributes",
-  ];
-
-  const buildProductPayload = () => {
-    const form = state.productForm;
-    const payload: Record<string, any> = { name: form.formData.name.trim() };
-
-    if (form.formData.key?.trim()) payload.key = form.formData.key.trim();
-
-    const categoryValue = form.formData.category?.trim();
-    if (categoryValue) payload.category = categoryValue;
-
-    if (form.formData.price !== "") payload.price = Number(form.formData.price);
-    if (form.formData.salePrice !== "")
-      payload.salePrice = Number(form.formData.salePrice);
-    if (form.formData.sale !== "") payload.sale = Number(form.formData.sale);
-    if (form.formData.quantity !== "")
-      payload.quantity = Number(form.formData.quantity);
-    if (form.formData.des?.trim()) payload.des = form.formData.des.trim();
-    if (form.formData.not?.trim()) payload.not = form.formData.not.trim();
-
-    const colors = form.colorsList
-      .filter((color: string) => typeof color === "string" && color.trim() !== "")
-      .map((color: string) => color.trim());
-    if (colors.length) payload.colors = colors;
-
-    const sizes = form.sizesList
-      .filter((size: string) => typeof size === "string" && size.trim() !== "")
-      .map((size: string) => size.trim());
-    if (sizes.length) payload.sizes = sizes;
-
-    const general = buildObject(form.generalFields);
-    if (Object.keys(general).length) payload.general = general;
-    const myproduct = buildObject(form.myproductFields);
-    if (Object.keys(myproduct).length) payload.myproduct = myproduct;
-    const dimensions = buildObject(form.dimensionsFields);
-    if (Object.keys(dimensions).length) payload.dimensions = dimensions;
-    const warranty = buildObject(form.warrantyFields);
-    if (Object.keys(warranty).length) payload.warranty = warranty;
-    const customAttrs = buildObject(form.customAttributes);
-    if (Object.keys(customAttrs).length) payload.customAttributes = customAttrs;
-
-    return payload;
-  };
-
-  const buildProductScalarsFormData = (imagesOverride?: File[]) => {
-    const payload = buildProductPayload();
-    const body = new FormData();
-
-    body.append("name", payload.name);
-    if (payload.key) body.append("key", payload.key);
-    if (payload.category) body.append("category", payload.category);
-    if (payload.price !== undefined)
-      body.append("price", String(payload.price));
-    if (payload.salePrice !== undefined)
-      body.append("salePrice", String(payload.salePrice));
-    if (payload.sale !== undefined) body.append("sale", String(payload.sale));
-    if (payload.quantity !== undefined)
-      body.append("quantity", String(payload.quantity));
-    if (payload.des) body.append("des", payload.des);
-    if (payload.not) body.append("not", payload.not);
-
-    payload.colors?.forEach((color: string) => body.append("colors", color));
-    payload.sizes?.forEach((size: string) => body.append("sizes", size));
-    const imagesToAttach = imagesOverride ?? state.productForm.images;
-    imagesToAttach.forEach((file: File) => body.append("images", file));
-
-    return body;
-  };
-
-  const hasNestedFields = (payload: Record<string, any>) =>
-    NESTED_PRODUCT_KEYS.some(
-      (key) => payload[key] && Object.keys(payload[key]).length > 0,
-    );
-
-  const pickNestedFields = (payload: Record<string, any>) => {
-    const nested: Record<string, any> = {};
-    NESTED_PRODUCT_KEYS.forEach((key) => {
-      if (payload[key]) nested[key] = payload[key];
-    });
-    return nested;
-  };
-
-  const submitProduct = async ({ endpoint, method = "POST", imagesOverride }: { endpoint: string; method?: string; imagesOverride?: File[] }) => {
-    const payload = buildProductPayload();
-    const imagesToUse = imagesOverride ?? state.productForm.images;
-    const hasImages = imagesToUse.length > 0;
-
-    if (!hasImages) {
-      return fetchInstance(endpoint, {
-        method,
-        body: JSON.stringify(payload),
-      });
-    }
-
-    const scalarBody = buildProductScalarsFormData(imagesToUse);
-
-    if (method === "POST") {
-      const result = await fetchInstance(endpoint, {
-        method: "POST",
-        body: scalarBody,
-      });
-      const productId = result.product?._id;
-
+      const productId = result?.product?._id;
       if (productId && hasNestedFields(payload)) {
         await fetchInstance(`/update-product/${productId}`, {
           method: "PUT",
@@ -409,20 +383,221 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
         });
       }
 
+      if (result?.product) {
+        dispatch({ type: ACTIONS.ADD_PRODUCT, payload: result.product });
+      }
+
       return result;
+    } finally {
+      dispatch({ type: ACTIONS.SET_PRODUCT_LOADING, payload: false });
     }
-
-    await fetchInstance(endpoint, {
-      method: "PUT",
-      body: JSON.stringify(payload),
-    });
-
-    return fetchInstance(endpoint, { method: "PUT", body: scalarBody });
   };
 
-  const isValidObjectId = (value: string) => /^[0-9a-fA-F]{24}$/.test(value);
+  const updateProductWithPayload = async (
+    productId: string,
+    payload: Record<string, unknown>,
+    images: File[],
+  ) => {
+    const hasImages = images.length > 0;
+    const nested = pickNestedFields(payload);
+    const hasNested = hasNestedFields(payload);
 
-  const buildProductFormData = () => buildProductScalarsFormData();
+    if (!hasImages) {
+      const data = await fetchInstance(`/update-product/${productId}`, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+      return data?.product ?? data;
+    }
+
+    await fetchInstance(`/update-product/${productId}`, {
+      method: "PUT",
+      body: buildScalarsFormData(payload, images),
+    });
+
+    if (hasNested) {
+      const data = await fetchInstance(`/update-product/${productId}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name: payload.name,
+          price: payload.price,
+          ...nested,
+        }),
+      });
+      return data?.product ?? data;
+    }
+
+    return fetchInstance(`/update-product/${productId}`, {
+      method: "PUT",
+      body: JSON.stringify({ name: payload.name, price: payload.price }),
+    });
+  };
+
+  const handleProductForm = (type: string, payload?: unknown) => {
+    dispatch({ type, payload });
+  };
+
+  const initAddProductPage = useCallback(() => {
+    dispatch({ type: ACTIONS.RESET_PRODUCT_FORM });
+    dispatch({ type: ACTIONS.RESET_PRODUCT_FORM_UI });
+  }, []);
+
+  const initEditProductPage = useCallback(
+    (productId: string) => {
+      dispatch({ type: ACTIONS.RESET_PRODUCT_FORM_UI });
+
+      const product = findProductById(state.products, productId);
+      if (!product) {
+        patchUi({ editingProduct: null });
+        return;
+      }
+
+      patchUi({ editingProduct: product });
+      dispatch({
+        type: ACTIONS.SET_ALL_PRODUCT_DATA,
+        payload: productToFormState(product),
+      });
+    },
+    [state.products, patchUi],
+  );
+
+  const setFormField = useCallback((name: string, value: string) => {
+    dispatch({
+      type: ACTIONS.SET_PRODUCT_FORM_DATA,
+      payload: { name, value },
+    });
+  }, []);
+
+  const setSelectedImages = useCallback(
+    (files: File[]) => {
+      patchUi({ selectedImages: files });
+      dispatch({ type: ACTIONS.SET_PRODUCT_IMAGES, payload: files });
+    },
+    [patchUi],
+  );
+
+  const setNewCategoryName = useCallback(
+    (name: string) => patchUi({ newCategoryName: name }),
+    [patchUi],
+  );
+
+  const toggleCategoryInput = useCallback(() => {
+    patchUi({ showCategoryInput: !state.productFormUi.showCategoryInput });
+  }, [patchUi, state.productFormUi.showCategoryInput]);
+
+  const cancelCategoryInput = useCallback(() => {
+    patchUi({ showCategoryInput: false, newCategoryName: "" });
+  }, [patchUi]);
+
+  const handleAddCategory = useCallback(async () => {
+    const { showCategoryInput, newCategoryName } = state.productFormUi;
+
+    if (!showCategoryInput) {
+      patchUi({ showCategoryInput: true });
+      return;
+    }
+
+    if (!newCategoryName.trim()) {
+      cancelCategoryInput();
+      return;
+    }
+
+    patchUi({ categoryLoading: true });
+    try {
+      const res = await createCategory(newCategoryName.trim());
+      if (res.success && res.category) {
+        setFormField("category", String(res.category._id));
+        cancelCategoryInput();
+        showPopup("Success", "Category added successfully!", "success");
+      } else {
+        showPopup("Error", res.message || "Failed to add category", "error");
+      }
+    } finally {
+      patchUi({ categoryLoading: false });
+    }
+  }, [state.productFormUi, patchUi, cancelCategoryInput, setFormField, showPopup]);
+
+  const submitAddProduct = useCallback(async () => {
+    patchUi({ loading: true, successRedirect: null });
+    try {
+      const payload = buildProductPayload(state.productForm);
+      const result = await createProductWithPayload(
+        payload,
+        state.productFormUi.selectedImages,
+      );
+
+      dispatch({ type: ACTIONS.RESET_PRODUCT_FORM });
+      patchUi({ selectedImages: [] });
+      showPopup(
+        "Success",
+        result?.msg || "Product added successfully!",
+        "success",
+      );
+    } catch (err: unknown) {
+      showPopup(
+        "Error",
+        err instanceof Error ? err.message : "Failed to add product.",
+        "error",
+      );
+    } finally {
+      patchUi({ loading: false });
+    }
+  }, [state.productForm, state.productFormUi.selectedImages, patchUi, showPopup]);
+
+  const submitUpdateProduct = useCallback(async () => {
+    const { editingProduct } = state.productFormUi;
+    if (!editingProduct) return;
+
+    const productId = String(editingProduct._id ?? editingProduct.id);
+    patchUi({ loading: true, successRedirect: "/getproducts" });
+
+    try {
+      const payload = buildProductPayload(state.productForm);
+      const updated = await updateProductWithPayload(
+        productId,
+        payload,
+        state.productFormUi.selectedImages,
+      );
+
+      if (updated) {
+        dispatch({ type: ACTIONS.UPDATE_PRODUCT, payload: updated });
+      } else {
+        await fetchProducts();
+      }
+
+      showPopup("Success", "Product updated successfully!", "success");
+    } catch (err: unknown) {
+      patchUi({ successRedirect: null });
+      showPopup(
+        "Error",
+        err instanceof Error ? err.message : "Failed to update product.",
+        "error",
+      );
+    } finally {
+      patchUi({ loading: false });
+    }
+  }, [state.productForm, state.productFormUi, patchUi, showPopup]);
+
+  const closeProductPopup = useCallback(
+    (redirectTo?: string | null) => {
+      const redirect = redirectTo ?? state.productFormUi.successRedirect;
+      patchUi({
+        popup: { ...state.productFormUi.popup, open: false },
+        successRedirect: null,
+      });
+      if (redirect && typeof window !== "undefined") {
+        window.location.href = redirect;
+      }
+    },
+    [patchUi, state.productFormUi.popup, state.productFormUi.successRedirect],
+  );
+
+  const dismissProductPopup = useCallback(() => {
+    patchUi({
+      popup: { ...state.productFormUi.popup, open: false },
+      successRedirect: null,
+    });
+  }, [patchUi, state.productFormUi.popup]);
 
   useEffect(() => {
     if (authLoading || !isAuthenticated) return;
@@ -433,16 +608,28 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   return (
     <ProductContext.Provider
       value={{
-        ...state,
-        createProduct,
+        products: state.products,
+        categories: state.categories,
+        productCreateLoading: state.productCreateLoading,
+        productForm: state.productForm,
+        productFormUi: state.productFormUi,
         fetchProducts,
         fetchCategories,
         deleteProduct,
         createCategory,
         handleProductForm,
-        buildProductFormData,
-        submitProduct,
-        isValidObjectId,
+        initAddProductPage,
+        initEditProductPage,
+        setFormField,
+        setSelectedImages,
+        setNewCategoryName,
+        toggleCategoryInput,
+        cancelCategoryInput,
+        handleAddCategory,
+        submitAddProduct,
+        submitUpdateProduct,
+        closeProductPopup,
+        dismissProductPopup,
       }}
     >
       {children}
