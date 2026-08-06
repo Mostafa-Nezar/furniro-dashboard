@@ -20,10 +20,6 @@ export default function DashboardPage() {
   const { orders, usersData, loading } = useAppContext();
   const { products, categories } = useProductContext();
 
-  if (loading) {
-    return <p className="text-center py-6 text-muted">Loading dashboard...</p>;
-  }
-
   const totalRevenue = orders.reduce((sum: number, order: { total?: number }) => sum + (order.total || 0), 0);
 
   const processedData = useMemo(() => {
@@ -170,6 +166,10 @@ export default function DashboardPage() {
       funnelData,
     };
   }, [orders, usersData, products, categories, totalRevenue]);
+
+  if (loading) {
+    return <p className="text-center py-6 text-muted">Loading dashboard...</p>;
+  }
 
   return (
     <div className="w-full">

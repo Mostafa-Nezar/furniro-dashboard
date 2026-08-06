@@ -246,7 +246,7 @@ type ProductContextValue = {
   setNewCategoryName: (name: string) => void;
   toggleCategoryInput: () => void;
   cancelCategoryInput: () => void;
-  handleAddCategory: () => Promise<void>;
+  handleAddCategory: (imageFile?: File | null) => Promise<void>;
   submitAddProduct: () => Promise<void>;
   submitUpdateProduct: () => Promise<void>;
   closeProductPopup: (redirectTo?: string | null) => void;
@@ -489,7 +489,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     patchUi({ showCategoryInput: false, newCategoryName: "" });
   }, [patchUi]);
 
-  const handleAddCategory = useCallback(async () => {
+  const handleAddCategory = useCallback(async (imageFile?: File | null) => {
     const { showCategoryInput, newCategoryName } = state.productFormUi;
 
     if (!showCategoryInput) {
@@ -504,7 +504,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
     patchUi({ categoryLoading: true });
     try {
-      const res = await createCategory(newCategoryName.trim());
+      const res = await createCategory(newCategoryName.trim(), imageFile ?? null);
       if (res.success && res.category) {
         setFormField("category", String(res.category._id));
         cancelCategoryInput();

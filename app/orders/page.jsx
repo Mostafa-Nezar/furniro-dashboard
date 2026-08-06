@@ -1,14 +1,11 @@
 "use client";
-import { useEffect } from "react";
-import { useAppContext } from "../context/context";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
+import { useEffect } from "react";
 
 export default function Orders() {
   const { orders, loading, fetchOrders, deleteOrder } = useAppContext();
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  useEffect(()=>{console.log(orders);},[])
   const router = useRouter();
 
   if (loading) return <p className="text-center py-4 text-muted">Loading orders...</p>;

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useProductContext, ACTIONS } from "../context/prosuctcontext";
 import ImageEditorPanel from "./ImageEditorPanel";
@@ -40,6 +41,8 @@ export default function ProductForm({
   } = useProductContext();
 
   const router = useRouter();
+  const [categoryImageFile, setCategoryImageFile] = useState(null);
+  const [categoryImagePreview, setCategoryImagePreview] = useState("");
   const {
     loading,
     categoryLoading,
@@ -70,6 +73,35 @@ export default function ProductForm({
       return;
     }
     dismissProductPopup();
+  };
+
+  const clearCategoryImageSelection = () => {
+    setCategoryImageFile(null);
+    setCategoryImagePreview("");
+  };
+
+  const handleCategoryImageSelect = (e) => {
+    const file = e.target.files?.[0] || null;
+    setCategoryImageFile(file);
+
+    if (!file) {
+      setCategoryImagePreview("");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => setCategoryImagePreview(reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleCategoryAction = async () => {
+    if (!showCategoryInput) {
+      await handleAddCategory();
+      return;
+    }
+
+    await handleAddCategory(categoryImageFile);
+    clearCategoryImageSelection();
   };
 
   return (
@@ -134,7 +166,7 @@ export default function ProductForm({
                     </select>
                     <button
                       type="button"
-                      onClick={handleAddCategory}
+                      onClick={handleCategoryAction}
                       disabled={categoryLoading}
                       className="whitespace-nowrap rounded-2xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-700 transition disabled:opacity-50"
                     >
@@ -143,21 +175,45 @@ export default function ProductForm({
                   </div>
 
                   {showCategoryInput && (
-                    <input
-                      type="text"
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddCategory();
-                        }
-                        if (e.key === "Escape") cancelCategoryInput();
-                      }}
-                      placeholder="New category name"
-                      autoFocus
-                      className={inputClass}
-                    />
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleCategoryAction();
+                          }
+                          if (e.key === "Escape") {
+                            cancelCategoryInput();
+                            clearCategoryImageSelection();
+                          }
+                        }}
+                        placeholder="New category name"
+                        autoFocus
+                        className={inputClass}
+                      />
+
+                      <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-3">
+                        <label className="mb-2 block text-sm font-medium text-slate-400">
+                          Category Image (Optional)
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleCategoryImageSelect}
+                          className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 file:mr-3 file:rounded-full file:border-0 file:bg-violet-600 file:px-3 file:py-1.5 file:text-white"
+                        />
+                        {categoryImagePreview && (
+                          <img
+                            src={categoryImagePreview}
+                            alt="Category preview"
+                            className="mt-3 h-16 w-16 rounded-xl border border-slate-700 object-cover"
+                          />
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
