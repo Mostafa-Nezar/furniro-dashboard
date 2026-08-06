@@ -75,18 +75,16 @@ const ChartsPage = () => {
         const performance = new Map();
 
         orders.forEach((order) => {
-            const items = order.items || [];
-            items.forEach((item) => {
-                const product = products.find((p) => p._id === item.productId);
-                if (!product) return;
+            const productsInOrder = order.products || order.items || [];
+            productsInOrder.forEach((item) => {
+                const productName = String(item.name || item.productName || 'Unknown');
+                const quantity = Number(item.quantity || 1);
+                const price = Number(item.price || item.salePrice || 0);
 
-                const name = String(product.name || 'Unknown');
-                const current = performance.get(name) || { sales: 0, revenue: 0 };
-                const quantity = item.quantity || 1;
-
+                const current = performance.get(productName) || { sales: 0, revenue: 0 };
                 current.sales += quantity;
-                current.revenue += (item.price || 0) * quantity;
-                performance.set(name, current);
+                current.revenue += price * quantity;
+                performance.set(productName, current);
             });
         });
 
@@ -94,14 +92,18 @@ const ChartsPage = () => {
             .map(([name, data]) => ({ name, sales: data.sales, revenue: data.revenue }))
             .sort((a, b) => b.revenue - a.revenue)
             .slice(0, 5);
-    }, [orders, products]);
+    }, [orders]);
 
     const pieData = useMemo(
         () =>
             categories
                 .map((category) => ({
                     name: String(category.name || 'Uncategorized'),
-                    value: products.filter((product) => product.category === category._id).length,
+                    value: products.filter((product) =>
+                        String(product.category) === String(category._id) ||
+                        String(product.category) === String(category.name) ||
+                        String(product.category) === String(category.slug)
+                    ).length,
                 }))
                 .filter((entry) => entry.value > 0),
         [categories, products],
