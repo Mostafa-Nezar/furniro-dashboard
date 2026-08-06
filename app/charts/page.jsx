@@ -1,6 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useAppContext } from '../context/context';
+import { useProductContext } from '../context/prosuctcontext';
 import {
     LineChart,
     Line,
@@ -28,117 +30,174 @@ import {
     RadialBar,
     Treemap,
     Sankey,
-    Sink,
-    Link,
     FunnelChart,
     Funnel,
     Cell,
 } from 'recharts';
 
 const ChartsPage = () => {
-    // Sample data for charts
-    const lineData = [
-        { name: 'Jan', value: 400, pv: 2400 },
-        { name: 'Feb', value: 300, pv: 1398 },
-        { name: 'Mar', value: 200, pv: 9800 },
-        { name: 'Apr', value: 278, pv: 3908 },
-        { name: 'May', value: 189, pv: 4800 },
-        { name: 'Jun', value: 239, pv: 3800 },
-    ];
+    const { orders, usersData } = useAppContext();
+    const { products, categories } = useProductContext();
 
-    const barData = [
-        { name: 'Product A', sales: 400, revenue: 2400 },
-        { name: 'Product B', sales: 300, revenue: 1398 },
-        { name: 'Product C', sales: 200, revenue: 9800 },
-        { name: 'Product D', sales: 278, revenue: 3908 },
-        { name: 'Product E', sales: 189, revenue: 4800 },
-    ];
-
-    const pieData = [
-        { name: 'Category A', value: 400 },
-        { name: 'Category B', value: 300 },
-        { name: 'Category C', value: 300 },
-        { name: 'Category D', value: 200 },
-    ];
-
-    const radarData = [
-        { subject: 'Math', A: 120, B: 110, fullMark: 150 },
-        { subject: 'Chinese', A: 98, B: 130, fullMark: 150 },
-        { subject: 'English', A: 86, B: 130, fullMark: 150 },
-        { subject: 'Geography', A: 99, B: 100, fullMark: 150 },
-        { subject: 'Physics', A: 85, B: 90, fullMark: 150 },
-        { subject: 'History', A: 65, B: 85, fullMark: 150 },
-    ];
-
-    const scatterData = [
-        { x: 100, y: 200, z: 200 },
-        { x: 120, y: 100, z: 260 },
-        { x: 170, y: 300, z: 400 },
-        { x: 140, y: 250, z: 280 },
-        { x: 150, y: 400, z: 500 },
-        { x: 110, y: 280, z: 200 },
-    ];
-
-    const radialData = [
-        { name: '18-24', uv: 31.47, pv: 2400, fill: '#8884d8' },
-        { name: '25-29', uv: 26.69, pv: 4567, fill: '#83a6ed' },
-        { name: '30-34', uv: 15.69, pv: 1398, fill: '#8dd1e1' },
-        { name: '35-39', uv: 8.22, pv: 9800, fill: '#82ca9d' },
-        { name: '40-49', uv: 8.63, pv: 3908, fill: '#a4de6c' },
-        { name: '50+', uv: 2.63, pv: 4800, fill: '#d084d0' },
-    ];
-
-    const treeData = [
-        {
-            name: 'axis',
-            children: [
-                { name: 'Axes', value: 10 },
-                { name: 'Legend', value: 15 },
-                { name: 'Tooltip', value: 10 },
-            ],
-        },
-        {
-            name: 'series',
-            children: [
-                { name: 'Line', value: 20 },
-                { name: 'Bar', value: 25 },
-                { name: 'Pie', value: 15 },
-            ],
-        },
-    ];
-
-    const sankeyData = {
-        nodes: [
-            { name: 'Node A' },
-            { name: 'Node B' },
-            { name: 'Node C' },
-            { name: 'Node D' },
-            { name: 'Node E' },
-        ],
-        links: [
-            { source: 0, target: 1, value: 10 },
-            { source: 0, target: 2, value: 20 },
-            { source: 1, target: 3, value: 15 },
-            { source: 2, target: 4, value: 25 },
-        ],
-    };
-
-    const funnelData = [
-        { name: 'Visits', value: 100 },
-        { name: 'Click', value: 80 },
-        { name: 'Add to Cart', value: 50 },
-        { name: 'Checkout', value: 30 },
-        { name: 'Purchase', value: 20 },
-    ];
-
-    const COLORS = ['#7c3aed', '#0ea5e9', '#f59e0b', '#22c55e', '#ef4444'];
+    const COLORS = ['#475569', '#64748b', '#0f766e', '#2f855a', '#d97706'];
     const chartTextStyle = { fill: '#cbd5e1', fontSize: 12 };
+
+    const totalRevenue = useMemo(
+        () => orders.reduce((sum, order) => sum + (order.total || 0), 0),
+        [orders],
+    );
+
+    const lineData = useMemo(() => {
+        const monthlyMap = new Map();
+
+        orders.forEach((order) => {
+            const createdAt = order.createdAt || order.date;
+            const date = new Date(createdAt);
+            if (!createdAt || Number.isNaN(date.getTime())) return;
+
+            const key = `${date.getFullYear()}-${date.getMonth()}`;
+            const name = date.toLocaleString('en-US', { month: 'short', year: '2-digit' });
+            const current = monthlyMap.get(key) || { name, value: 0, pv: 0 };
+
+            current.value += 1;
+            current.pv += order.total || 0;
+
+            monthlyMap.set(key, current);
+        });
+
+        return Array.from(monthlyMap)
+            .sort(([aKey], [bKey]) => aKey.localeCompare(bKey))
+            .map(([, value]) => value)
+            .slice(-6);
+    }, [orders]);
+
+    const barData = useMemo(() => {
+        const performance = new Map();
+
+        orders.forEach((order) => {
+            const items = order.items || [];
+            items.forEach((item) => {
+                const product = products.find((p) => p._id === item.productId);
+                if (!product) return;
+
+                const name = String(product.name || 'Unknown');
+                const current = performance.get(name) || { sales: 0, revenue: 0 };
+                const quantity = item.quantity || 1;
+
+                current.sales += quantity;
+                current.revenue += (item.price || 0) * quantity;
+                performance.set(name, current);
+            });
+        });
+
+        return Array.from(performance)
+            .map(([name, data]) => ({ name, sales: data.sales, revenue: data.revenue }))
+            .sort((a, b) => b.revenue - a.revenue)
+            .slice(0, 5);
+    }, [orders, products]);
+
+    const pieData = useMemo(
+        () =>
+            categories
+                .map((category) => ({
+                    name: String(category.name || 'Uncategorized'),
+                    value: products.filter((product) => product.category === category._id).length,
+                }))
+                .filter((entry) => entry.value > 0),
+        [categories, products],
+    );
+
+    const radarData = useMemo(() => {
+        const totalStock = products.reduce((sum, product) => sum + (product.quantity || 0), 0);
+        const avgOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
+
+        return [
+            { subject: 'Orders', A: Math.min(orders.length * 4, 150), B: Math.min(orders.length * 2, 150), fullMark: 150 },
+            { subject: 'Users', A: Math.min(usersData.length * 3, 150), B: Math.min(orders.length * 2, 150), fullMark: 150 },
+            { subject: 'Revenue', A: Math.min(totalRevenue / 1000, 150), B: Math.min(avgOrderValue / 10, 150), fullMark: 150 },
+            { subject: 'Products', A: Math.min(products.length * 3, 150), B: Math.min(categories.length * 5, 150), fullMark: 150 },
+            { subject: 'Categories', A: Math.min(categories.length * 10, 150), B: Math.min(usersData.length * 2, 150), fullMark: 150 },
+            { subject: 'Stock', A: Math.min(totalStock / 5, 150), B: Math.min(totalStock / 10, 150), fullMark: 150 },
+        ];
+    }, [orders.length, usersData.length, products.length, categories.length, totalRevenue, products]);
+
+    const scatterData = useMemo(
+        () =>
+            products.map((product) => ({
+                x: Number(product.price) || 0,
+                y: Number(product.quantity) || 0,
+                z: Number(product.price || 0) * (Number(product.quantity) || 1),
+            })),
+        [products],
+    );
+
+    const radialData = useMemo(() => {
+        const statusTotals = orders.reduce((acc, order) => {
+            const status = String(order.status || 'pending');
+            acc[status] = (acc[status] || 0) + 1;
+            return acc;
+        }, {});
+
+        return Object.entries(statusTotals).map(([name, count], index) => ({
+            name: name.charAt(0).toUpperCase() + name.slice(1),
+            uv: Number(count),
+            pv: Number(count) * 100,
+            fill: COLORS[index % COLORS.length],
+        }));
+    }, [orders]);
+
+    const treeData = useMemo(
+        () =>
+            categories.map((category) => ({
+                name: String(category.name || 'Unknown'),
+                children: products
+                    .filter((product) => product.category === category._id)
+                    .map((product) => ({
+                        name: String(product.name || 'Product').slice(0, 20),
+                        value: Number(product.quantity) || 1,
+                    })),
+            })),
+        [categories, products],
+    );
+
+    const sankeyData = useMemo(() => {
+        const completed = orders.filter((order) => order.status === 'completed').length;
+        const pending = orders.filter((order) => order.status === 'pending').length;
+        const cancelled = orders.filter((order) => order.status === 'cancelled').length;
+
+        return {
+            nodes: [
+                { name: 'All Orders' },
+                { name: 'Placed' },
+                { name: 'Completed' },
+                { name: 'Pending' },
+                { name: 'Cancelled' },
+            ],
+            links: [
+                { source: 0, target: 1, value: orders.length },
+                { source: 1, target: 2, value: completed },
+                { source: 1, target: 3, value: pending },
+                { source: 1, target: 4, value: cancelled },
+            ],
+        };
+    }, [orders]);
+
+    const funnelData = useMemo(
+        () => [
+            { name: 'Total Users', value: usersData.length },
+            { name: 'Visited', value: Math.floor(usersData.length * 0.7) },
+            { name: 'Viewed Products', value: Math.floor(usersData.length * 0.5) },
+            { name: 'Added to Cart', value: Math.floor(usersData.length * 0.3) },
+            { name: 'Purchased', value: orders.length },
+        ],
+        [usersData.length, orders.length],
+    );
 
     return (
         <div className="min-h-screen bg-app p-6 md:p-8">
             <div className="mx-auto max-w-7xl space-y-8">
                 <div className="rounded-2xl border border-[color:var(--color-border)] bg-surface/80 p-6 shadow-2xl shadow-black/20 backdrop-blur-sm">
-                    <h1 className="text-3xl font-bold text-heading">Recharts Dashboard</h1>
+                    <h1 className="text-3xl font-bold text-heading">Statistics</h1>
                 </div>
 
                 {/* 1. Line Chart */}

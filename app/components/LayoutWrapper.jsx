@@ -119,16 +119,6 @@ export default function LayoutWrapper({ children }) {
               <span>Users</span>
             </Link>
             <Link
-              href="/products"
-              className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 transition ${pathname === "/products"
-                ? "bg-[color:var(--color-primary)]/20 text-heading shadow-sm"
-                : "text-body hover:bg-[color:var(--color-card)] hover:text-heading"
-                }`}
-            >
-              <Package size={18} />
-              <span>Add products</span>
-            </Link>
-            <Link
               href="/getproducts"
               className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 transition ${pathname === "/getproducts"
                 ? "bg-[color:var(--color-primary)]/20 text-heading shadow-sm"
@@ -136,7 +126,7 @@ export default function LayoutWrapper({ children }) {
                 }`}
             >
               <Package size={18} />
-              <span>All products</span>
+              <span>Furnitures</span>
             </Link>
             <Link
               href="/categories"

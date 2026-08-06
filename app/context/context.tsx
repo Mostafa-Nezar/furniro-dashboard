@@ -10,6 +10,8 @@ const AppContext = createContext<{
   loading: boolean;
   fetchUsers: () => Promise<void>;
   fetchOrders: () => Promise<void>;
+  fetchPosts: () => Promise<void>;
+  createPost: (formData: FormData) => Promise<any>;
   handleDeleteUser: (id: string) => Promise<void>;
   deleteOrder: (id: string) => Promise<void>;
 } | null>(null);
@@ -84,8 +86,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: ACTIONS.SET_LOADING, payload: false });
     }
   };
+  
 
-    const fetchPosts = async () => {
+  const fetchPosts = async () => {
     try {
       dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
@@ -97,6 +100,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (err: unknown) {
       console.error("fetchPosts error:", err instanceof Error ? err.message : err);
+    } finally {
+      dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+    }
+  };
+
+  const createPost = async (formData: FormData) => {
+    try {
+      dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+      const data = await fetchInstance("/post", {
+        method: "POST",
+        body: formData,
+      });
+
+      const newPost = data?.post || data;
+
+      dispatch({
+        type: ACTIONS.SET_POSTS,
+        payload: [newPost, ...state.posts],
+      });
+
+      return data;
+    } catch (err: unknown) {
+      console.error("createPost error:", err instanceof Error ? err.message : err);
+      throw err;
     } finally {
       dispatch({ type: ACTIONS.SET_LOADING, payload: false });
     }
@@ -147,6 +175,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ...state,
         fetchUsers,
         fetchOrders,
+        fetchPosts,
+        createPost,
         handleDeleteUser,
         deleteOrder,
       }}

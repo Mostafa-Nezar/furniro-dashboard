@@ -3,15 +3,17 @@ import { useState } from "react";
 import { useAppContext } from "../context/context";
 
 export default function PostsPage() {
-  const { posts } = useAppContext();
+  const { posts, createPost } = useAppContext();
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+  const categoryOptions = ["Furniture", "Design", "Decor", "Interior"];
+
   const [formData, setFormData] = useState({
     id: "",
     title: "",
     category: "",
     content: "",
+    date: "",
   });
   const [imageFile, setImageFile] = useState(null);
 
@@ -35,13 +37,14 @@ export default function PostsPage() {
       if (formData.title) data.append("title", formData.title);
       if (formData.category) data.append("category", formData.category);
       if (formData.content) data.append("content", formData.content);
+      if (formData.date) data.append("date", formData.date);
       if (imageFile) data.append("image", imageFile);
 
       const res = await createPost(data);
       if (res && res.post) {
         alert("Post added successfully!");
         setShowAddForm(false);
-        setFormData({ id: "", title: "", category: "", content: "" });
+        setFormData({ id: "", title: "", category: "", content: ""});
         setImageFile(null);
       } else {
         alert(res?.message || "Failed to add post");
@@ -110,9 +113,9 @@ export default function PostsPage() {
                 required
               >
                 <option value="">Select Category</option>
-                {(categories || []).map((cat) => (
-                  <option key={cat._id} value={cat.name}>
-                    {cat.name}
+                {categoryOptions.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
                   </option>
                 ))}
               </select>
@@ -163,7 +166,7 @@ export default function PostsPage() {
             <div className="relative h-48 bg-slate-950 overflow-hidden">
               {post.image ? (
                 <img
-                  src={`http://localhost:5000${post.image}`}
+                  src={post.image}
                   alt={post.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />

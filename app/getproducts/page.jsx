@@ -1,7 +1,8 @@
 "use client";
+import Link from "next/link";
 import { useProductContext } from "../context/prosuctcontext";
 import { useRouter } from "next/navigation";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Package, Trash2 } from "lucide-react";
 
 const StarIcon = ({ rating }) => (
   <svg
@@ -23,9 +24,18 @@ export default function Products() {
 
   return (
     <div className="w-full">
-      <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-heading">Products Catalog</h1>
-        <p className="text-sm text-muted mt-2">Manage and organize all your products</p>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-heading">Products Catalog</h1>
+          <p className="text-sm text-muted mt-2">Manage and organize all your products</p>
+        </div>
+        <Link
+          href="/products"
+          className="inline-flex items-center gap-2 rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-semibold text-heading transition hover:border-slate-500 hover:bg-slate-900 hover:text-white"
+        >
+          <Package size={18} />
+          <span>Add Product</span>
+        </Link>
       </div>
       <div className="grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {products.map((product) => (
@@ -130,6 +140,19 @@ export default function Products() {
             </div>
           </div>
         ))}
+        <Link
+          href="/products"
+          className="rounded-2xl border border-dashed border-slate-700 bg-slate-950/70 p-6 flex flex-col items-center justify-center gap-3 text-center text-heading transition hover:border-slate-500 hover:bg-slate-900"
+          key="add-product-card"
+        >
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-800 text-slate-100 shadow-lg shadow-slate-950/20">
+            <Package size={28} />
+          </div>
+          <div>
+            <p className="text-lg font-semibold">Add new product</p>
+            <p className="text-sm text-slate-400">Create a new item in your catalog</p>
+          </div>
+        </Link>
       </div>
     </div>
   );
