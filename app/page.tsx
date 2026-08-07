@@ -45,56 +45,54 @@ export default function DashboardPage() {
       value: products.filter((p: any) => p.category === cat._id).length,
     }));
 
-    // Product performance - Top 5 products by quantity sold
-    const productPerformance = new Map();
-    orders.forEach((order: any) => {
-      const items = order.items || [];
-      items.forEach((item: any) => {
-        const product = products.find((p: any) => p._id === item.productId);
-        if (product) {
-          const current = productPerformance.get(product.name) || { count: 0, revenue: 0 };
-          current.count += item.quantity || 1;
-          current.revenue += (item.price || 0) * (item.quantity || 1);
-          productPerformance.set(product.name, current);
-        }
-      });
-    });
+    // Product performance - real products from the current context data
+    const productData = products
+      .map((product: any) => {
+        const price = Number(product.salePrice || product.price || 0);
+        const stock = Number(product.quantity || 0);
+        const revenue = price * Math.max(stock, 1);
 
-    const productData = Array.from(productPerformance)
-      .map(([name, data]) => ({
-        name: name.length > 15 ? name.substring(0, 15) + "..." : name,
-        sales: data.count,
-        revenue: data.revenue,
-      }))
+        return {
+          name: (product.name || "Unnamed Product").length > 15
+            ? (product.name || "Unnamed Product").substring(0, 15) + "..."
+            : product.name || "Unnamed Product",
+          sales: stock,
+          revenue,
+        };
+      })
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
 
-    // If no products data, use placeholder
-    if (productData.length === 0) {
-      productData.push(
-        { name: "Product A", sales: 5, revenue: 2400 },
-        { name: "Product B", sales: 3, revenue: 1398 },
-        { name: "Product C", sales: 8, revenue: 4800 }
-      );
-    }
-
-    // Radar data - Real metrics
+    // Radar data - real store metrics from products, orders, users, and categories
     const avgOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
+    const totalStock = products.reduce((sum: number, product: any) => sum + (Number(product.quantity) || 0), 0);
+    const maxMetric = Math.max(
+      20,
+      orders.length,
+      usersData.length,
+      products.length,
+      categories.length,
+      Math.ceil(totalRevenue / 1000),
+      Math.ceil(totalStock / 5),
+    );
+
     const radarData = [
-      { subject: "Total Orders", A: Math.min(orders.length * 5, 150), B: Math.min(products.length * 3, 150), fullMark: 150 },
-      { subject: "Users", A: Math.min(usersData.length * 2, 150), B: Math.min(orders.length, 150), fullMark: 150 },
-      { subject: "Revenue", A: Math.min(totalRevenue / 1000, 150), B: Math.min(avgOrderValue * 2, 150), fullMark: 150 },
-      { subject: "Products", A: Math.min(products.length * 2, 150), B: Math.min(categories.length * 5, 150), fullMark: 150 },
-      { subject: "Categories", A: Math.min(categories.length * 10, 150), B: Math.min(usersData.length / 2, 150), fullMark: 150 },
-      { subject: "Satisfaction", A: 120, B: 110, fullMark: 150 },
+      { subject: "Orders", A: Math.min(orders.length, maxMetric), B: Math.min(orders.length, maxMetric), fullMark: maxMetric },
+      { subject: "Users", A: Math.min(usersData.length, maxMetric), B: Math.min(orders.length, maxMetric), fullMark: maxMetric },
+      { subject: "Revenue", A: Math.min(Math.ceil(totalRevenue / 1000), maxMetric), B: Math.min(Math.ceil(avgOrderValue / 10), maxMetric), fullMark: maxMetric },
+      { subject: "Products", A: Math.min(products.length, maxMetric), B: Math.min(categories.length, maxMetric), fullMark: maxMetric },
+      { subject: "Categories", A: Math.min(categories.length, maxMetric), B: Math.min(usersData.length, maxMetric), fullMark: maxMetric },
+      { subject: "Stock", A: Math.min(Math.ceil(totalStock / 5), maxMetric), B: Math.min(Math.ceil(totalStock / 10), maxMetric), fullMark: maxMetric },
     ];
 
-    // Scatter data - Product price vs quantity
-    const scatterData = products.slice(0, 6).map((p: any) => ({
-      x: p.price || 0,
-      y: p.quantity || 0,
-      z: p.salePrice || p.price || 0,
-    }));
+    // Scatter data - real price, sale price, and stock from products
+    const scatterData = products
+      .map((product: any) => ({
+        x: Number(product.price || 0),
+        y: Number(product.salePrice || product.price || 0),
+        z: Number(product.quantity || 0),
+      }))
+      .filter((point) => point.x > 0 || point.y > 0 || point.z > 0);
 
     // Radial bar data - Orders by status
     const statusMap = new Map();
@@ -124,21 +122,21 @@ export default function DashboardPage() {
         }))
       : [{ name: "Categories", children: [{ name: "No Data", value: 1 }] }];
 
-    // Sankey data - Real order flow
+    // Sankey data - real user-to-order flow from the current context data
     const completedOrders = orders.filter((o: any) => o.status === "completed").length;
     const pendingOrders = orders.filter((o: any) => o.status === "pending").length;
     const cancelledOrders = orders.filter((o: any) => o.status === "cancelled").length;
 
     const sankeyData = {
       nodes: [
-        { name: "All Users" },
-        { name: "Placed Order" },
+        { name: "Users" },
+        { name: "Orders" },
         { name: "Completed" },
         { name: "Pending" },
         { name: "Cancelled" },
       ],
       links: [
-        { source: 0, target: 1, value: orders.length },
+        { source: 0, target: 1, value: Math.max(orders.length, 1) },
         { source: 1, target: 2, value: completedOrders },
         { source: 1, target: 3, value: pendingOrders },
         { source: 1, target: 4, value: cancelledOrders },
