@@ -1,4 +1,4 @@
-const BACKEND_URL = "http://localhost:3001/api";
+const BACKEND_URL = "https://furniro-back.vercel.app/api";
 
 const buildUrl = (endpoint: string) => `${BACKEND_URL}${endpoint}`;
 
