@@ -7,6 +7,7 @@ const AppContext = createContext<{
   usersData: any[];
   orders: any[];
   posts: any[];
+  loginlogs: any[];
   loading: boolean;
   fetchUsers: () => Promise<void>;
   fetchOrders: () => Promise<void>;
@@ -20,6 +21,7 @@ const initialState = {
   usersData: [],
   orders: [],
   posts: [],
+  loginlogs: [],
   loading: false,
 };
 
@@ -27,6 +29,7 @@ export const ACTIONS = {
   SET_USERS: "SET_USERS",
   SET_ORDERS: "SET_ORDERS",
   SET_POSTS: "SET_POSTS",
+  SET_LOGINLOGS: "SET_LOGINLOGS",
   SET_LOADING: "SET_LOADING",
 };
 
@@ -40,6 +43,9 @@ function reducer(state: typeof initialState, action: { type: string; payload?: a
 
     case ACTIONS.SET_POSTS:
       return { ...state, posts: action.payload };
+
+    case ACTIONS.SET_LOGINLOGS:
+      return { ...state, loginlogs: action.payload };
 
     case ACTIONS.SET_LOADING:
       return { ...state, loading: action.payload };
@@ -87,7 +93,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
   
-
   const fetchPosts = async () => {
     try {
       dispatch({ type: ACTIONS.SET_LOADING, payload: true });
@@ -96,6 +101,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       dispatch({
         type: ACTIONS.SET_POSTS,
+        payload: data || [],
+      });
+    } catch (err: unknown) {
+      console.error("fetchPosts error:", err instanceof Error ? err.message : err);
+    } finally {
+      dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+    }
+  };
+
+  const fetchLoginlogs = async () => {
+    try {
+      dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+      const data = await fetchInstance("/login-logs");
+
+      dispatch({
+        type: ACTIONS.SET_LOGINLOGS,
         payload: data || [],
       });
     } catch (err: unknown) {
@@ -167,6 +189,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     fetchUsers();
     fetchOrders();
     fetchPosts();
+    fetchLoginlogs();
   }, [authLoading, isAuthenticated]);
 
   return (
