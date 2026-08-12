@@ -12,6 +12,7 @@ import {
   X,
   List,
   FileText,
+  LogIn,
   BarChart,
 } from "lucide-react";
 import ProtectedRoute from "./ProtectedRoute";
@@ -155,7 +156,7 @@ export default function LayoutWrapper({ children }) {
                 : "text-body hover:bg-[color:var(--color-card)] hover:text-heading"
                 }`}
             >
-              <FileText size={18} />
+              <LogIn size={18} />
               <span>Login logs</span>
             </Link>
             <Link
