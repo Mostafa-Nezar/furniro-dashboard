@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useAppContext } from "../context/context";
-import { CheckCircle2, XCircle, Trash2 } from "lucide-react";
+import { CheckCircle2, XCircle, Trash2, Bell, ShoppingCart, Package } from "lucide-react";
 
 export default function Users() {
   const { usersData, loading, handleDeleteUser } = useAppContext();
@@ -22,6 +22,9 @@ export default function Users() {
               <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-slate-300 uppercase tracking-wider">ID</th>
               <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-slate-300 uppercase tracking-wider">Name</th>
               <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-semibold text-slate-300 uppercase tracking-wider hidden md:table-cell">Email</th>
+              <th className="px-4 sm:px-6 py-4 text-center text-xs sm:text-sm font-semibold text-slate-300 uppercase tracking-wider">Notifications</th>
+              <th className="px-4 sm:px-6 py-4 text-center text-xs sm:text-sm font-semibold text-slate-300 uppercase tracking-wider hidden lg:table-cell">Cart Items</th>
+              <th className="px-4 sm:px-6 py-4 text-center text-xs sm:text-sm font-semibold text-slate-300 uppercase tracking-wider hidden lg:table-cell">Orders</th>
               <th className="px-4 sm:px-6 py-4 text-center text-xs sm:text-sm font-semibold text-slate-300 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -38,6 +41,30 @@ export default function Users() {
                   </td>
                   <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-slate-400 hidden md:table-cell truncate">
                     {user.email}
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <Bell size={14} className="text-blue-400" />
+                      <span className="text-xs sm:text-sm font-semibold text-blue-300">
+                        {Array.isArray(user?.notifications) ? user.notifications.length : (user?.notifications ? 1 : 0)}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 text-center hidden lg:table-cell">
+                    <div className="flex items-center justify-center gap-1">
+                      <ShoppingCart size={14} className="text-emerald-400" />
+                      <span className="text-xs sm:text-sm font-semibold text-emerald-300">
+                        {user?.cart?.items?.length || 0}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 text-center hidden lg:table-cell">
+                    <div className="flex items-center justify-center gap-1">
+                      <Package size={14} className="text-purple-400" />
+                      <span className="text-xs sm:text-sm font-semibold text-purple-300">
+                        {user?.orders?.length || 0}
+                      </span>
+                    </div>
                   </td>
                   <td className="px-4 sm:px-6 py-4 text-center">
                     <div className="flex gap-2 justify-center flex-wrap">
@@ -62,7 +89,7 @@ export default function Users() {
             ) : (
               <tr>
                 <td
-                  colSpan="4"
+                  colSpan="7"
                   className="text-center px-6 py-8 text-slate-400"
                 >
                   No users found

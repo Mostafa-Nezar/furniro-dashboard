@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAppContext } from "../../context/context";
-import { ArrowLeft, Mail, Phone, MapPin, ShoppingCart, Package, Check, X } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, ShoppingCart, Package, Check, X, Bell } from "lucide-react";
 
 export default function UserProfilePage() {
     const { usersData, orders, loading } = useAppContext();
@@ -124,60 +124,141 @@ export default function UserProfilePage() {
                 </div>
 
                 <div className="card p-6 space-y-6">
-                    <div className="flex items-center gap-3">
-                        <ShoppingCart size={20} />
-                        <div>
-                            <p className="text-sm uppercase tracking-[0.2em] text-muted">Orders</p>
-                            <p className="text-2xl font-semibold text-heading">{userOrders.length}</p>
-                        </div>
-                    </div>
-                    <div className="rounded-2xl border border-slate-700 bg-slate-950 p-4 space-y-3">
-                        <p className="text-sm text-muted">Orders linked to this user by email or name.</p>
-                        {userOrders.length === 0 ? (
-                            <p className="text-sm text-body">لا توجد طلبات مرتبطة بهذا المستخدم.</p>
-                        ) : (
-                            <div className="space-y-3">
-                                {userOrders.slice(0, 5).map((order) => (
-                                    <div key={order._id} className="rounded-2xl border border-slate-800 bg-slate-950 p-3">
-                                        <p className="text-sm font-medium text-heading">Order #{order._id}</p>
-                                        <p className="text-sm text-body">Total: ${order.total}</p>
-                                        <p className="text-sm text-muted">{new Date(order.date).toLocaleDateString()}</p>
-                                        <p className="text-sm">
-                                            Status: <span className="font-semibold">{order.status}</span>
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="border-t border-slate-700 pt-6">
+                    {/* Notifications Section */}
+                    <div>
                         <div className="flex items-center gap-3 mb-3">
-                            <Package size={20} />
+                            <Bell size={20} className="text-blue-400" />
                             <div>
-                                <p className="text-sm uppercase tracking-[0.2em] text-muted">Shopping Cart</p>
-                                <div className="flex items-center gap-2 mt-1">
-                                    {user?.cart ? (
-                                        <>
-                                            <Check size={16} className="text-emerald-400" />
-                                            <p className="text-sm font-semibold text-emerald-400">Active</p>
-                                        </>
+                                <p className="text-sm uppercase tracking-[0.2em] text-muted">Notifications</p>
+                                <p className="text-2xl font-semibold text-heading">
+                                    {Array.isArray(user?.notifications) ? user.notifications.length : (user?.notifications ? 1 : 0)}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="rounded-2xl border border-slate-700 bg-slate-950 p-4 space-y-3 max-h-[300px] overflow-y-auto">
+                            {!user?.notifications || (Array.isArray(user?.notifications) && user.notifications.length === 0) ? (
+                                <p className="text-sm text-body">لا توجد إشعارات لهذا المستخدم.</p>
+                            ) : (
+                                <div className="space-y-2">
+                                    {Array.isArray(user?.notifications) ? (
+                                        user.notifications.map((notif) => (
+                                            <div key={notif._id} className="rounded-2xl border border-slate-800 bg-slate-900 p-3">
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div className="flex-1">
+                                                        <p className="text-sm font-medium text-heading">{notif.title}</p>
+                                                        <p className="text-xs text-body mt-1">{notif.message}</p>
+                                                        <p className="text-xs text-muted mt-1">
+                                                            {new Date(notif.createdAt).toLocaleDateString()} {new Date(notif.createdAt).toLocaleTimeString()}
+                                                        </p>
+                                                    </div>
+                                                    <div className={`text-xs font-semibold px-2 py-1 rounded ${notif.read ? 'bg-slate-700 text-slate-300' : 'bg-blue-900/50 text-blue-300'}`}>
+                                                        {notif.read ? 'Read' : 'Unread'}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
                                     ) : (
-                                        <>
-                                            <X size={16} className="text-slate-500" />
-                                            <p className="text-sm font-semibold text-slate-500">No Cart</p>
-                                        </>
+                                        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-3">
+                                            <p className="text-sm font-medium text-heading">{user.notifications.title}</p>
+                                            <p className="text-xs text-body mt-1">{user.notifications.message}</p>
+                                            <p className="text-xs text-muted mt-1">
+                                                {new Date(user.notifications.createdAt).toLocaleDateString()}
+                                            </p>
+                                        </div>
                                     )}
                                 </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Cart Section */}
+                    <div className="border-t border-slate-700 pt-6">
+                        <div className="flex items-center gap-3 mb-3">
+                            <ShoppingCart size={20} className="text-emerald-400" />
+                            <div>
+                                <p className="text-sm uppercase tracking-[0.2em] text-muted">Shopping Cart</p>
+                                <p className="text-2xl font-semibold text-heading">
+                                    {user?.cart?.items?.length || 0}
+                                </p>
                             </div>
                         </div>
-                        {user?.cart && (
-                            <div className="rounded-2xl border border-slate-700 bg-slate-950 p-4">
-                                <p className="text-xs text-slate-400 mb-2">Cart ID:</p>
-                                <p className="text-sm font-mono text-slate-300 break-all">{user.cart}</p>
-                                <p className="text-xs text-slate-500 mt-3">عرض بيانات الكارت الكاملة متاح في صفحة العملاء</p>
+                        <div className="rounded-2xl border border-slate-700 bg-slate-950 p-4 space-y-3 max-h-[300px] overflow-y-auto">
+                            {!user?.cart || !user.cart.items || user.cart.items.length === 0 ? (
+                                <p className="text-sm text-body">السلة فارغة</p>
+                            ) : (
+                                <>
+                                    <div className="space-y-2">
+                                        {user.cart.items.map((item, index) => (
+                                            <div key={index} className="rounded-2xl border border-slate-800 bg-slate-900 p-3">
+                                                <div className="flex gap-3">
+                                                    {item.image && (
+                                                        <img
+                                                            src={item.image}
+                                                            alt={item.name}
+                                                            className="w-12 h-12 rounded object-cover"
+                                                        />
+                                                    )}
+                                                    <div className="flex-1">
+                                                        <p className="text-sm font-medium text-heading">{item.name}</p>
+                                                        <p className="text-xs text-muted mt-1">Qty: {item.quantity}</p>
+                                                        <p className="text-xs text-body">${item.price}</p>
+                                                        {item.variant?.color && (
+                                                            <p className="text-xs text-muted mt-1">Color: {item.variant.color}</p>
+                                                        )}
+                                                        {item.variant?.size && (
+                                                            <p className="text-xs text-muted">Size: {item.variant.size}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="border-t border-slate-700 pt-3 mt-3">
+                                        <div className="flex justify-between">
+                                            <p className="text-sm font-semibold text-heading">Total Price:</p>
+                                            <p className="text-sm font-semibold text-emerald-400">${user.cart.totalPrice?.toFixed(2) || '0.00'}</p>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Orders Section */}
+                    <div className="border-t border-slate-700 pt-6">
+                        <div className="flex items-center gap-3 mb-3">
+                            <Package size={20} className="text-purple-400" />
+                            <div>
+                                <p className="text-sm uppercase tracking-[0.2em] text-muted">Orders</p>
+                                <p className="text-2xl font-semibold text-heading">{userOrders.length}</p>
                             </div>
-                        )}
+                        </div>
+                        <div className="rounded-2xl border border-slate-700 bg-slate-950 p-4 space-y-3 max-h-[300px] overflow-y-auto">
+                            {userOrders.length === 0 ? (
+                                <p className="text-sm text-body">لا توجد طلبات مرتبطة بهذا المستخدم.</p>
+                            ) : (
+                                <div className="space-y-3">
+                                    {userOrders.slice(0, 10).map((order) => (
+                                        <div key={order._id} className="rounded-2xl border border-slate-800 bg-slate-900 p-3">
+                                            <div className="flex items-start justify-between gap-2 mb-2">
+                                                <p className="text-sm font-medium text-heading">Order #{order._id?.slice(-8)}</p>
+                                                <span className={`text-xs font-semibold px-2 py-1 rounded ${order.status === 'delivered' ? 'bg-emerald-900/50 text-emerald-300' :
+                                                        order.status === 'shipping' ? 'bg-blue-900/50 text-blue-300' :
+                                                            order.status === 'pending' ? 'bg-yellow-900/50 text-yellow-300' :
+                                                                order.status === 'refused' || order.status === 'cancelled' ? 'bg-red-900/50 text-red-300' :
+                                                                    'bg-slate-700 text-slate-300'
+                                                    }`}>
+                                                    {order.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-body">Total: <span className="font-semibold text-heading">${order.total}</span></p>
+                                            <p className="text-xs text-muted mt-1">{new Date(order.date).toLocaleDateString()}</p>
+                                            <p className="text-xs text-body mt-1">{order.products?.length || 0} items</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
