@@ -1,12 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
-import {useAppContext} from "../context/context"
+import { useAppContext } from "../context/context"
 import { useEffect } from "react";
 
 export default function Orders() {
   const { orders, loading, fetchOrders, deleteOrder } = useAppContext();
-  useEffect(()=>{console.log(orders);},[])
   const router = useRouter();
 
   if (loading) return <p className="text-center py-4 text-muted">Loading orders...</p>;
@@ -48,17 +47,17 @@ export default function Orders() {
                   title={order._id}
                 >{order._id.slice(0, 3)}</td>
                 <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm font-medium text-slate-100 hidden sm:table-cell">
-                  {order.customerInfo?.fullName}
+                  {order.userref?.name}
                 </td>
                 <td className="px-4 sm:px-6 py-4">
                   <span
                     className={`inline-block px-3 py-1.5 rounded-lg text-xs font-semibold ${order.status === "pending"
-                        ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                        : order.status === "completed"
-                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                          : order.status === "shipping"
-                            ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                            : "bg-slate-500/20 text-slate-400 border border-slate-500/30"
+                      ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                      : order.status === "completed"
+                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                        : order.status === "shipping"
+                          ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                          : "bg-slate-500/20 text-slate-400 border border-slate-500/30"
                       }`}
                   >
                     {order.status}
