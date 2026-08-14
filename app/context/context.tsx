@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useReducer, useEffect } from "react";
+import { createContext, useContext, useReducer, useEffect, useCallback } from "react";
 import { fetchInstance } from "./api";
 import { useAuthContext } from "./authcontext";
 
@@ -8,11 +8,13 @@ const AppContext = createContext<{
   orders: any[];
   posts: any[];
   loginlogs: any[];
+  loginlogsPagination: any;
   loading: boolean;
   fetchUsers: () => Promise<void>;
   fetchOrders: () => Promise<void>;
   fetchPosts: () => Promise<void>;
   createPost: (formData: FormData) => Promise<any>;
+  fetchLoginlogs: (page?: number, limit?: number, append?: boolean) => Promise<void>;
   handleDeleteUser: (id: string) => Promise<void>;
   deleteOrder: (id: string) => Promise<void>;
 } | null>(null);
@@ -22,6 +24,7 @@ const initialState = {
   orders: [],
   posts: [],
   loginlogs: [],
+  loginlogsPagination: {},
   loading: false,
 };
 
@@ -30,6 +33,7 @@ export const ACTIONS = {
   SET_ORDERS: "SET_ORDERS",
   SET_POSTS: "SET_POSTS",
   SET_LOGINLOGS: "SET_LOGINLOGS",
+  SET_LOGINLOGS_PAGINATION: "SET_LOGINLOGS_PAGINATION",
   SET_LOADING: "SET_LOADING",
 };
 
@@ -46,6 +50,9 @@ function reducer(state: typeof initialState, action: { type: string; payload?: a
 
     case ACTIONS.SET_LOGINLOGS:
       return { ...state, loginlogs: action.payload };
+
+    case ACTIONS.SET_LOGINLOGS_PAGINATION:
+      return { ...state, loginlogsPagination: action.payload };
 
     case ACTIONS.SET_LOADING:
       return { ...state, loading: action.payload };
@@ -92,7 +99,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: ACTIONS.SET_LOADING, payload: false });
     }
   };
-  
+
   const fetchPosts = async () => {
     try {
       dispatch({ type: ACTIONS.SET_LOADING, payload: true });
@@ -110,22 +117,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const fetchLoginlogs = async () => {
+  const fetchLoginlogs = useCallback(async (page = 1, limit = 20, append = false) => {
     try {
       dispatch({ type: ACTIONS.SET_LOADING, payload: true });
-
-      const data = await fetchInstance("/login-logs");
-
-      dispatch({
-        type: ACTIONS.SET_LOGINLOGS,
-        payload: data || [],
-      });
+      const data = await fetchInstance(`/login-logs?page=${page}&limit=${limit}`);
+      dispatch({ type: ACTIONS.SET_LOGINLOGS, payload: append ? [...state.loginlogs, ...(data?.logs || [])] : data?.logs || [], });
+      dispatch({ type: ACTIONS.SET_LOGINLOGS_PAGINATION, payload: data?.pagination || {} });
     } catch (err: unknown) {
       console.error("fetchPosts error:", err instanceof Error ? err.message : err);
     } finally {
       dispatch({ type: ACTIONS.SET_LOADING, payload: false });
     }
-  };
+  }, [state.loginlogs]);
 
   const createPost = async (formData: FormData) => {
     try {
@@ -200,6 +203,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         fetchOrders,
         fetchPosts,
         createPost,
+        fetchLoginlogs,
         handleDeleteUser,
         deleteOrder,
       }}
