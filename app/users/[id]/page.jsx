@@ -97,6 +97,10 @@ export default function UserProfilePage() {
                                 <p className="text-xs uppercase text-muted mb-1">Google User</p>
                                 <p className="text-base font-medium text-body">{user.isGoogleUser ? "Yes" : "No"}</p>
                             </div>
+                            <div className="rounded-2xl border border-slate-700 bg-slate-950 p-4">
+                                <p className="text-xs uppercase text-muted mb-1">github User</p>
+                                <p className="text-base font-medium text-body">{user.isGithubUser ? "Yes" : "No"}</p>
+                            </div>
                         </div>
                     </div>
 
@@ -243,10 +247,10 @@ export default function UserProfilePage() {
                                             <div className="flex items-start justify-between gap-2 mb-2">
                                                 <p className="text-sm font-medium text-heading">Order #{order._id?.slice(-8)}</p>
                                                 <span className={`text-xs font-semibold px-2 py-1 rounded ${order.status === 'delivered' ? 'bg-emerald-900/50 text-emerald-300' :
-                                                        order.status === 'shipping' ? 'bg-blue-900/50 text-blue-300' :
-                                                            order.status === 'pending' ? 'bg-yellow-900/50 text-yellow-300' :
-                                                                order.status === 'refused' || order.status === 'cancelled' ? 'bg-red-900/50 text-red-300' :
-                                                                    'bg-slate-700 text-slate-300'
+                                                    order.status === 'shipping' ? 'bg-blue-900/50 text-blue-300' :
+                                                        order.status === 'pending' ? 'bg-yellow-900/50 text-yellow-300' :
+                                                            order.status === 'refused' || order.status === 'cancelled' ? 'bg-red-900/50 text-red-300' :
+                                                                'bg-slate-700 text-slate-300'
                                                     }`}>
                                                     {order.status}
                                                 </span>
