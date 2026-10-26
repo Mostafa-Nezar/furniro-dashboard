@@ -53,9 +53,9 @@ export default function DashboardPage() {
         const revenue = price * Math.max(stock, 1);
 
         return {
-          name: (product.name || "Unnamed Product").length > 15
-            ? (product.name || "Unnamed Product").substring(0, 15) + "..."
-            : product.name || "Unnamed Product",
+          name: (product.name || "Unnamed Furniture").length > 15
+            ? (product.name || "Unnamed Furniture").substring(0, 15) + "..."
+            : product.name || "Unnamed Furniture",
           sales: stock,
           revenue,
         };
@@ -80,7 +80,7 @@ export default function DashboardPage() {
       { subject: "Orders", A: Math.min(orders.length, maxMetric), B: Math.min(orders.length, maxMetric), fullMark: maxMetric },
       { subject: "Users", A: Math.min(usersData.length, maxMetric), B: Math.min(orders.length, maxMetric), fullMark: maxMetric },
       { subject: "Revenue", A: Math.min(Math.ceil(totalRevenue / 1000), maxMetric), B: Math.min(Math.ceil(avgOrderValue / 10), maxMetric), fullMark: maxMetric },
-      { subject: "Products", A: Math.min(products.length, maxMetric), B: Math.min(categories.length, maxMetric), fullMark: maxMetric },
+      { subject: "Furniture", A: Math.min(products.length, maxMetric), B: Math.min(categories.length, maxMetric), fullMark: maxMetric },
       { subject: "Categories", A: Math.min(categories.length, maxMetric), B: Math.min(usersData.length, maxMetric), fullMark: maxMetric },
       { subject: "Stock", A: Math.min(Math.ceil(totalStock / 5), maxMetric), B: Math.min(Math.ceil(totalStock / 10), maxMetric), fullMark: maxMetric },
     ];
@@ -147,7 +147,7 @@ export default function DashboardPage() {
     const funnelData = [
       { name: "Total Users", value: usersData.length },
       { name: "Visited", value: Math.floor(usersData.length * 0.8) },
-      { name: "Viewed Products", value: Math.floor(usersData.length * 0.6) },
+      { name: "Viewed Furniture", value: Math.floor(usersData.length * 0.6) },
       { name: "Added to Cart", value: Math.floor(usersData.length * 0.4) },
       { name: "Purchased", value: orders.length },
     ];
@@ -209,7 +209,7 @@ export default function DashboardPage() {
           <div className="card p-6">
             <h3 className="text-xl font-bold text-heading mb-4">
               <SvgIcon type="barChart" className="inline-block mr-2 w-5 h-5" title="Bar chart icon" />
-              Bar Chart - Product Performance
+              Bar Chart - Furniture Performance
             </h3>
             <BarChartComponent data={processedData.productData} title="" />
           </div>

@@ -16,15 +16,15 @@ export default function EditProductPage() {
 
   if (!productFormUi.editingProduct) {
     return (
-      <p className="text-center py-6 text-slate-400">Loading product...</p>
+      <p className="text-center py-6 text-slate-400">Loading furniture...</p>
     );
   }
 
   return (
     <ProductForm
       mode="edit"
-      title="Edit Product"
-      submitLabel="Update Product"
+      title="Edit Furniture"
+      submitLabel="Update Furniture"
     />
   );
 }

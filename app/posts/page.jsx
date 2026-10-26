@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useAppContext } from "../context/context";
+import { toast } from "../context/toast";
 
 export default function PostsPage() {
   const { posts, createPost } = useAppContext();
@@ -42,16 +43,16 @@ export default function PostsPage() {
 
       const res = await createPost(data);
       if (res && res.post) {
-        alert("Post added successfully!");
+        toast.success("Post added successfully!");
         setShowAddForm(false);
         setFormData({ id: "", title: "", category: "", content: ""});
         setImageFile(null);
       } else {
-        alert(res?.message || "Failed to add post");
+        toast.error(res?.message || "Failed to add post");
       }
     } catch (err) {
       console.error(err);
-      alert(err.message || "An error occurred");
+      toast.error(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }

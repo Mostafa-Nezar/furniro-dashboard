@@ -117,7 +117,7 @@ const ChartsPage = () => {
             { subject: 'Orders', A: Math.min(orders.length * 4, 150), B: Math.min(orders.length * 2, 150), fullMark: 150 },
             { subject: 'Users', A: Math.min(usersData.length * 3, 150), B: Math.min(orders.length * 2, 150), fullMark: 150 },
             { subject: 'Revenue', A: Math.min(totalRevenue / 1000, 150), B: Math.min(avgOrderValue / 10, 150), fullMark: 150 },
-            { subject: 'Products', A: Math.min(products.length * 3, 150), B: Math.min(categories.length * 5, 150), fullMark: 150 },
+            { subject: 'Furniture', A: Math.min(products.length * 3, 150), B: Math.min(categories.length * 5, 150), fullMark: 150 },
             { subject: 'Categories', A: Math.min(categories.length * 10, 150), B: Math.min(usersData.length * 2, 150), fullMark: 150 },
             { subject: 'Stock', A: Math.min(totalStock / 5, 150), B: Math.min(totalStock / 10, 150), fullMark: 150 },
         ];
@@ -155,7 +155,7 @@ const ChartsPage = () => {
                 children: products
                     .filter((product) => product.category === category._id)
                     .map((product) => ({
-                        name: String(product.name || 'Product').slice(0, 20),
+                        name: String(product.name || 'Furniture').slice(0, 20),
                         value: Number(product.quantity) || 1,
                     })),
             })),
@@ -188,7 +188,7 @@ const ChartsPage = () => {
         () => [
             { name: 'Total Users', value: usersData.length },
             { name: 'Visited', value: Math.floor(usersData.length * 0.7) },
-            { name: 'Viewed Products', value: Math.floor(usersData.length * 0.5) },
+            { name: 'Viewed Furniture', value: Math.floor(usersData.length * 0.5) },
             { name: 'Added to Cart', value: Math.floor(usersData.length * 0.3) },
             { name: 'Purchased', value: orders.length },
         ],

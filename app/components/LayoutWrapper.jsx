@@ -127,7 +127,7 @@ export default function LayoutWrapper({ children }) {
                 }`}
             >
               <Package size={18} />
-              <span>Furnitures</span>
+              <span>Furniture</span>
             </Link>
             <Link
               href="/categories"

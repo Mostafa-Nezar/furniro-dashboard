@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../context/authcontext";
+import { toast } from "../context/toast";
 
 export default function AdminRegister() {
   const { register } = useAuthContext();
@@ -26,11 +27,11 @@ export default function AdminRegister() {
     try {
       const data = await register(form);
 
-      alert(data.msg || "تم التسجيل بنجاح");
+      toast.success(data.msg || "تم التسجيل بنجاح");
       router.push("/login");
     } catch (error) {
       console.error("Register error:", error);
-      alert(error.data?.msg || error.message || "حدث خطأ أثناء التسجيل");
+      toast.error(error.data?.msg || error.message || "حدث خطأ أثناء التسجيل");
     } finally {
       setLoading(false);
     }

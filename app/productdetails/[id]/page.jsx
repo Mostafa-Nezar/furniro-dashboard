@@ -19,7 +19,7 @@ export default function ProductDetails() {
     return (
       <div className="flex min-h-screen items-center justify-center px-4">
         <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-6 py-4 text-lg font-semibold text-red-400">
-          Product not found
+          Furniture not found
         </p>
       </div>
     );
@@ -28,7 +28,7 @@ export default function ProductDetails() {
   const galleryImages = (product.images || []).filter(Boolean);
   const detailSections = [
     ["General Info", product.general],
-    ["Product Details", product.myproduct],
+    ["Furniture Details", product.myproduct],
     ["Dimensions", product.dimensions],
     ["Warranty", product.warranty],
   ].filter(([, value]) => value);
@@ -41,7 +41,7 @@ export default function ProductDetails() {
           className="btn btn-primary mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm shadow-lg shadow-violet-500/20 sm:mb-6"
         >
           <ArrowLeft size={16} />
-          <span className="hidden sm:inline">Back to Products</span>
+          <span className="hidden sm:inline">Back to Furniture</span>
           <span className="sm:hidden">Back</span>
         </button>
 
@@ -50,7 +50,7 @@ export default function ProductDetails() {
             <div>
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-sm text-violet-200">
                 <Sparkles size={14} />
-                Product Overview
+                Furniture Overview
               </div>
               <h1 className="text-2xl font-bold text-heading sm:text-3xl lg:text-4xl">
                 {product.name}

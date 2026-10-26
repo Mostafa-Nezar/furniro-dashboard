@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useProductContext } from "../context/prosuctcontext";
+import { toast } from "../context/toast";
 
 export default function CategoriesPage() {
   const { categories, createCategory } = useProductContext();
@@ -21,9 +22,9 @@ export default function CategoriesPage() {
         setSelectedImage(null);
         setImagePreview("");
         setShowAddForm(false);
-        alert("Category added successfully!");
+        toast.success("Category added successfully!");
       } else {
-        alert(res.message || "Failed to add category");
+        toast.error(res.message || "Failed to add category");
       }
     } finally {
       setLoading(false);
@@ -49,7 +50,7 @@ export default function CategoriesPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold text-heading">Categories</h1>
-          <p className="text-sm text-muted mt-2">Manage your product categories</p>
+          <p className="text-sm text-muted mt-2">Manage your furniture categories</p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}

@@ -9,6 +9,7 @@ import {
 } from "react";
 import { fetchInstance } from "./api";
 import { useAuthContext } from "./authcontext";
+import { toast } from "./toast";
 import {
   buildProductPayload,
   buildScalarsFormData,
@@ -22,6 +23,7 @@ import {
 
 export const ACTIONS = {
   SET_PRODUCTS: "SET_PRODUCTS",
+  REMOVE_PRODUCT: "REMOVE_PRODUCT",
   ADD_PRODUCT: "ADD_PRODUCT",
   UPDATE_PRODUCT: "UPDATE_PRODUCT",
   SET_CATEGORIES: "SET_CATEGORIES",
@@ -66,11 +68,33 @@ function reducer(
     case ACTIONS.SET_PRODUCTS:
       return { ...state, products: action.payload as Record<string, unknown>[] };
 
-    case ACTIONS.ADD_PRODUCT:
+    case ACTIONS.REMOVE_PRODUCT:
       return {
         ...state,
-        products: [...state.products, action.payload as Record<string, unknown>],
+        products: state.products.filter(
+          (product) =>
+            String(product.id ?? "") !== String(action.payload) &&
+            String(product._id ?? "") !== String(action.payload),
+        ),
       };
+
+    case ACTIONS.ADD_PRODUCT:
+      {
+        const product = action.payload as Record<string, unknown>;
+        const productId = String(product._id ?? product.id ?? "");
+        const existingIndex = state.products.findIndex(
+          (item) => String(item._id ?? item.id ?? "") === productId,
+        );
+        if (!productId || existingIndex === -1) {
+          return { ...state, products: [...state.products, product] };
+        }
+        return {
+          ...state,
+          products: state.products.map((item, index) =>
+            index === existingIndex ? { ...item, ...product } : item,
+          ),
+        };
+      }
 
     case ACTIONS.UPDATE_PRODUCT:
       return {
@@ -247,7 +271,7 @@ type ProductContextValue = {
   toggleCategoryInput: () => void;
   cancelCategoryInput: () => void;
   handleAddCategory: (imageFile?: File | null) => Promise<void>;
-  submitAddProduct: () => Promise<void>;
+  submitAddProduct: () => Promise<boolean>;
   submitUpdateProduct: () => Promise<void>;
   closeProductPopup: (redirectTo?: string | null) => void;
   dismissProductPopup: () => void;
@@ -287,9 +311,18 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   const fetchProducts = async () => {
     try {
       const data = await fetchInstance("/products/db");
+      const productList = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.products)
+          ? data.products
+          : Array.isArray(data?.data?.products)
+            ? data.data.products
+            : Array.isArray(data?.data)
+              ? data.data
+            : [];
       dispatch({
         type: ACTIONS.SET_PRODUCTS,
-        payload: data || [],
+        payload: productList,
       });
     } catch (err: unknown) {
       console.error(
@@ -336,16 +369,40 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteProduct = async (id: string) => {
-    try {
-      await fetchInstance(`/products/${id}/delete`, { method: "DELETE" });
-      dispatch({
-        type: ACTIONS.SET_PRODUCTS,
-        payload: state.products.filter((p) => p._id !== id),
-      });
-    } catch (err: unknown) {
-      console.error(err instanceof Error ? err.message : err);
-      alert("Error deleting product");
+    if (!id) {
+      toast.error("Furniture ID is missing");
+      return;
     }
+
+    const candidateEndpoints = [
+      `/products/${id}`,
+      `/products/${id}/delete`,
+      `/delete-product/${id}`,
+      `/product/${id}`,
+      `/product/${id}/delete`,
+    ];
+
+    let lastError: unknown = null;
+
+    for (const endpoint of candidateEndpoints) {
+      try {
+        await fetchInstance(endpoint, { method: "DELETE" });
+
+        dispatch({ type: ACTIONS.REMOVE_PRODUCT, payload: id });
+
+        toast.success("Furniture deleted successfully");
+        return;
+      } catch (err) {
+        lastError = err;
+      }
+    }
+
+    console.error(lastError instanceof Error ? lastError.message : lastError);
+    toast.error(
+      lastError instanceof Error
+        ? lastError.message
+        : "Error deleting furniture",
+    );
   };
 
   const createProductWithPayload = async (
@@ -357,23 +414,51 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     try {
       const hasImages = images.length > 0;
 
+      let result: any;
       if (!hasImages) {
-        const data = await fetchInstance("/add-product", {
+        result = await fetchInstance("/add-product", {
           method: "POST",
           body: JSON.stringify(payload),
         });
-        if (data?.product) dispatch({ type: ACTIONS.ADD_PRODUCT, payload: data.product });
-        return data;
+      } else {
+        result = await fetchInstance("/add-product", {
+          method: "POST",
+          body: buildScalarsFormData(payload, images),
+        });
       }
 
-      const result = await fetchInstance("/add-product", {
-        method: "POST",
-        body: buildScalarsFormData(payload, images),
-      });
+      if (result?.success === false) {
+        throw new Error(result.message || result.msg || "Failed to add furniture.");
+      }
 
-      const productId = result?.product?._id;
+      let createdProduct = result?.product ?? result?.data?.product;
+      if (
+        !createdProduct &&
+        result?.data &&
+        typeof result.data === "object" &&
+        (result.data._id || result.data.id)
+      ) {
+        createdProduct = result.data;
+      }
+      if (!createdProduct && (result?._id || result?.id)) {
+        createdProduct = result;
+      }
+      if (createdProduct && typeof createdProduct === "object") {
+        dispatch({
+          type: ACTIONS.ADD_PRODUCT,
+          payload: {
+            ...createdProduct,
+            id: createdProduct.id ?? createdProduct._id,
+            images: Array.isArray(createdProduct.images)
+              ? createdProduct.images
+              : [],
+          },
+        });
+      }
+
+      const productId = createdProduct?._id ?? createdProduct?.id;
       if (productId && hasNestedFields(payload)) {
-        await fetchInstance(`/update-product/${productId}`, {
+        const updated = await fetchInstance(`/update-product/${productId}`, {
           method: "PUT",
           body: JSON.stringify({
             name: payload.name,
@@ -381,12 +466,23 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
             ...pickNestedFields(payload),
           }),
         });
+        createdProduct = updated?.product ?? updated?.data?.product ?? {
+          ...createdProduct,
+          ...pickNestedFields(payload),
+        };
+        dispatch({
+          type: ACTIONS.ADD_PRODUCT,
+          payload: {
+            ...createdProduct,
+            id: createdProduct.id ?? createdProduct._id,
+            images: Array.isArray(createdProduct.images)
+              ? createdProduct.images
+              : [],
+          },
+        });
       }
 
-      if (result?.product) {
-        dispatch({ type: ACTIONS.ADD_PRODUCT, payload: result.product });
-      }
-
+      await fetchProducts();
       return result;
     } finally {
       dispatch({ type: ACTIONS.SET_PRODUCT_LOADING, payload: false });
@@ -518,31 +614,26 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   }, [state.productFormUi, patchUi, cancelCategoryInput, setFormField, showPopup]);
 
   const submitAddProduct = useCallback(async () => {
-    patchUi({ loading: true, successRedirect: null });
+    patchUi({ loading: true });
     try {
       const payload = buildProductPayload(state.productForm);
-      const result = await createProductWithPayload(
+      await createProductWithPayload(
         payload,
         state.productFormUi.selectedImages,
       );
 
       dispatch({ type: ACTIONS.RESET_PRODUCT_FORM });
       patchUi({ selectedImages: [] });
-      showPopup(
-        "Success",
-        result?.msg || "Product added successfully!",
-        "success",
-      );
+      toast.success("Furniture added successfully!");
+      return true;
     } catch (err: unknown) {
-      showPopup(
-        "Error",
-        err instanceof Error ? err.message : "Failed to add product.",
-        "error",
-      );
+      console.error("Failed to add furniture:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to add furniture.");
+      return false;
     } finally {
       patchUi({ loading: false });
     }
-  }, [state.productForm, state.productFormUi.selectedImages, patchUi, showPopup]);
+  }, [state.productForm, state.productFormUi.selectedImages, patchUi]);
 
   const submitUpdateProduct = useCallback(async () => {
     const { editingProduct } = state.productFormUi;
@@ -565,12 +656,12 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
         await fetchProducts();
       }
 
-      showPopup("Success", "Product updated successfully!", "success");
+      showPopup("Success", "Furniture updated successfully!", "success");
     } catch (err: unknown) {
       patchUi({ successRedirect: null });
       showPopup(
         "Error",
-        err instanceof Error ? err.message : "Failed to update product.",
+        err instanceof Error ? err.message : "Failed to update furniture.",
         "error",
       );
     } finally {

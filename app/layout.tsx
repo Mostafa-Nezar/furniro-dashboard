@@ -3,6 +3,7 @@ import { AppProvider } from "./context/context";
 import { AuthProvider } from "./context/authcontext";
 import { ProductProvider } from "./context/prosuctcontext";
 import LayoutWrapper from "./components/LayoutWrapper";
+import ToastViewport from "./components/ToastViewport";
 
 export const metadata = {
   title: "Furniro Dashboard",
@@ -20,6 +21,7 @@ export default function RootLayout({
           <AppProvider>
             <ProductProvider>
               <LayoutWrapper>{children}</LayoutWrapper>
+              <ToastViewport />
             </ProductProvider>
           </AppProvider>
         </AuthProvider>

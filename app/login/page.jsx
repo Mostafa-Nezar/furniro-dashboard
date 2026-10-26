@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../context/authcontext";
 import { fetchInstance } from "../context/api";
+import { toast } from "../context/toast";
 
 export default function AdminLogin() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -36,14 +37,14 @@ export default function AdminLogin() {
           role: data.admin.role,
         };
         login(userData, data.token || null);
-        alert(data.msg || "login successfully");
+        toast.success(data.msg || "Login successful");
         router.push("/");
       } else {
-        alert(data.msg || "login failure");
+        toast.error(data.msg || "Login failed");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert(error.data?.msg || error.message || "something went wrong");
+      toast.error(error.data?.msg || error.message || "Something went wrong");
     } finally {
       setLoading(false);
     }

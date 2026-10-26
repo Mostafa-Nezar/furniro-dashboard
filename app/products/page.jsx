@@ -14,8 +14,8 @@ export default function AddProductPage() {
   return (
     <ProductForm
       mode="add"
-      title="Add New Product"
-      submitLabel="Save Product"
+      title="Add New Furniture"
+      submitLabel="Save Furniture"
     />
   );
 }

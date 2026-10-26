@@ -57,7 +57,6 @@ export default function UserProfilePage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
                     <h2 className="text-2xl sm:text-3xl font-bold text-heading">User Profile</h2>
-                    <p className="text-sm text-muted mt-1">عرض بيانات المستخدم من مصفوفة المستخدمين فقط.</p>
                 </div>
                 <div className="flex gap-2">
                     <button
@@ -239,7 +238,7 @@ export default function UserProfilePage() {
                         </div>
                         <div className="rounded-2xl border border-slate-700 bg-slate-950 p-4 space-y-3 max-h-[300px] overflow-y-auto">
                             {userOrders.length === 0 ? (
-                                <p className="text-sm text-body">لا توجد طلبات مرتبطة بهذا المستخدم.</p>
+                                <p className="text-sm text-body">Cart Is Empty</p>
                             ) : (
                                 <div className="space-y-3">
                                     {userOrders.slice(0, 10).map((order) => (

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAppContext } from "../../context/context";
 import { fetchInstance } from "../../context/api";
+import { toast } from "../../context/toast";
 import { ArrowLeft, Truck, CheckCircle2, XCircle } from "lucide-react";
 
 export default function OrderDetails() {
@@ -21,10 +22,11 @@ export default function OrderDetails() {
       if (data.success) {
         setOrder((prev) => ({ ...prev, status: data.order.status }));
       } else {
-        alert(data.message || "Failed to update status");
+        toast.error(data.message || "Failed to update status");
       }
     } catch (err) {
       console.error("❌ Error updating status:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to update status");
     } finally {
       setUpdating(false);
     }
@@ -109,7 +111,7 @@ export default function OrderDetails() {
         </p>
       </div>
       <div className="card p-4 sm:p-6 mb-4 sm:mb-6">
-        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-heading">Products</h3>
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-heading">Furniture</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse rounded-lg overflow-hidden">
             <thead>

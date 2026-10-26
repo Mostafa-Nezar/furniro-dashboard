@@ -2,6 +2,7 @@
 import { createContext, useContext, useReducer, useEffect, useCallback } from "react";
 import { fetchInstance } from "./api";
 import { useAuthContext } from "./authcontext";
+import { toast } from "./toast";
 
 const AppContext = createContext<{
   usersData: any[];
@@ -167,7 +168,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (err: unknown) {
       console.error(err instanceof Error ? err.message : err);
-      alert(err instanceof Error ? err.message : "Unknown error");
+      toast.error(err instanceof Error ? err.message : "Unknown error");
     }
   };
 
@@ -183,7 +184,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (err: unknown) {
       console.error(err instanceof Error ? err.message : err);
-      alert("Error deleting order");
+      toast.error("Error deleting order");
     }
   };
 

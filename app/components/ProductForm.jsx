@@ -8,7 +8,7 @@ import Popup from "./Popup";
 
 const TECHNICAL_SECTIONS = [
   { title: "General", fieldKey: "generalFields" },
-  { title: "My Product", fieldKey: "myproductFields" },
+  { title: "My Furniture", fieldKey: "myproductFields" },
   { title: "Dimensions", fieldKey: "dimensionsFields" },
   { title: "Warranty", fieldKey: "warrantyFields" },
   { title: "Custom Attributes", fieldKey: "customAttributes" },
@@ -55,10 +55,10 @@ export default function ProductForm({
   const formData = productForm.formData;
   const isEdit = mode === "edit";
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (isEdit) submitUpdateProduct();
-    else submitAddProduct();
+    else if (await submitAddProduct()) router.push("/getproducts");
   };
 
   const handlePopupClose = () => {
@@ -133,7 +133,7 @@ export default function ProductForm({
                 type="text"
                 name="name"
                 value={formData.name}
-                placeholder="Product Name"
+                placeholder="Furniture Name"
                 onChange={(e) => setFormField(e.target.name, e.target.value)}
                 required
                 className={inputClass}
@@ -144,7 +144,7 @@ export default function ProductForm({
                   type="text"
                   name="key"
                   value={formData.key}
-                  placeholder="Product Key"
+                  placeholder="Furniture Key"
                   onChange={(e) => setFormField(e.target.name, e.target.value)}
                   className={inputClass}
                 />
@@ -223,7 +223,7 @@ export default function ProductForm({
                   type="number"
                   name="price"
                   value={formData.price}
-                  placeholder="Product Price"
+                  placeholder="Furniture Price"
                   onChange={(e) => setFormField(e.target.name, e.target.value)}
                   required
                   className={inputClass}
@@ -260,7 +260,7 @@ export default function ProductForm({
               <textarea
                 name="des"
                 value={formData.des}
-                placeholder="Product Description..."
+                placeholder="Furniture Description..."
                 onChange={(e) => setFormField(e.target.name, e.target.value)}
                 rows={4}
                 className={inputClass}
