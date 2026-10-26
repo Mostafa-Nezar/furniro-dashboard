@@ -187,7 +187,7 @@ export default function UserProfilePage() {
                         </div>
                         <div className="rounded-2xl border border-slate-700 bg-slate-950 p-4 space-y-3 max-h-[300px] overflow-y-auto">
                             {!user?.cart || !user.cart.items || user.cart.items.length === 0 ? (
-                                <p className="text-sm text-body">السلة فارغة</p>
+                                <p className="text-sm text-body">Cart Is Empty</p>
                             ) : (
                                 <>
                                     <div className="space-y-2">
@@ -238,7 +238,7 @@ export default function UserProfilePage() {
                         </div>
                         <div className="rounded-2xl border border-slate-700 bg-slate-950 p-4 space-y-3 max-h-[300px] overflow-y-auto">
                             {userOrders.length === 0 ? (
-                                <p className="text-sm text-body">Cart Is Empty</p>
+                                <p className="text-sm text-body">No Orders</p>
                             ) : (
                                 <div className="space-y-3">
                                     {userOrders.slice(0, 10).map((order) => (
