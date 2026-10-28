@@ -43,7 +43,7 @@ export default function UserProfilePage() {
                 </button>
                 <div className="card p-6 text-center">
                     <p className="text-lg font-semibold text-heading">User not found</p>
-                    <p className="text-sm text-muted mt-2">تأكد من اختيار مستخدم صحيح من قائمة المستخدمين.</p>
+                    <p className="text-sm text-muted mt-2">Check Users List</p>
                     <Link href="/users" className="btn btn-primary mt-4 inline-flex items-center justify-center">
                         Users list
                     </Link>
